@@ -3,8 +3,16 @@ cmake_minimum_required(VERSION 3.14)
 # Setting default variables.
 
 set(PROJECT_NAME Wolf3D)
-set(PROJECT_SRCS src/main.cpp src/Display.cpp src/Level.cpp src/Game.cpp include/Game.hh src/Player.cpp src/Position.cpp src/RayCaster.cpp include/RayCaster.hh)
 set(CMAKE_CXX_STANDARD 17)
+set(PROJECT_SRCS
+        src/main.cpp
+        src/Display.cpp
+        src/Level.cpp
+        src/Game.cpp
+        include/Game.hh
+        src/Player.cpp
+        src/Position.cpp
+        src/RayCaster.cpp)
 
 # Defining the project.
 

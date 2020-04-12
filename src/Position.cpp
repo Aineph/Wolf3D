@@ -52,6 +52,12 @@ Position &Position::operator=(Position const &other)
     return *this;
 }
 
+/**
+ * The position left shift operator.
+ * @param os
+ * @param position
+ * @return
+ */
 std::ostream &operator<<(std::ostream &os, Position const &position)
 {
     os << std::endl << "------------------------------" << std::endl;

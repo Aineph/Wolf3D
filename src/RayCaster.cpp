@@ -42,13 +42,13 @@ RayCaster::RayCaster(RayCaster const &other)
  * @param playerPosition
  * @param levelMap
  */
-int RayCaster::render(Position const &playerPosition, std::vector<std::vector<int>> const &levelMap, bool log)
+int RayCaster::render(Position const &playerPosition, std::vector<std::vector<int>> const &levelMap)
 {
     int wallDistance;
 
     this->initializeVectors(playerPosition);
     this->computeDistances(playerPosition);
-    this->cast(levelMap, log);
+    this->cast(levelMap);
     if (!this->getHitDirection())
     {
         if (this->getRayPosition().getDirectionX() == 0)
@@ -128,7 +128,7 @@ void RayCaster::computeDistances(Position const &playerPosition)
  * Casts a ray until it hits a wall.
  * @param levelMap
  */
-void RayCaster::cast(std::vector<std::vector<int>> const &levelMap, bool log)
+void RayCaster::cast(std::vector<std::vector<int>> const &levelMap)
 {
     bool wallEncountered = false;
 
@@ -151,11 +151,6 @@ void RayCaster::cast(std::vector<std::vector<int>> const &levelMap, bool log)
             Level::BLOCK_STANDARD_WALL)
             wallEncountered = true;
     }
-    this->_rayPosition.setPositionX((this->getRayPosition().getPositionX() / POSITION_UNIT_X) * POSITION_UNIT_X);
-    this->_rayPosition.setPositionY((this->getRayPosition().getPositionY() / POSITION_UNIT_Y) * POSITION_UNIT_Y);
-    if (log)
-        std::cout << "Hit X: " << this->getRayPosition().getPositionX() / POSITION_UNIT_X << ", Hit Y: "
-                  << this->getRayPosition().getPositionY() / POSITION_UNIT_Y << std::endl;
 }
 
 /**

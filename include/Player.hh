@@ -22,9 +22,9 @@ public:
 
     friend std::ostream &operator<<(std::ostream &, Player const &);
 
-    bool moveForward();
+    bool moveForward(std::vector<std::vector<int>> const &);
 
-    bool moveBackward();
+    bool moveBackward(std::vector<std::vector<int>> const &);
 
     bool rotateLeft();
 

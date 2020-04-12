@@ -33,6 +33,11 @@ Level::Level(Level const &other)
     this->setLevelWallsHeight(other.getLevelWallsHeight());
 }
 
+/**
+ * The level left shift operator.
+ * @param other
+ * @return
+ */
 Level &Level::operator=(Level const &other)
 {
     if (this != &other)
@@ -45,6 +50,12 @@ Level &Level::operator=(Level const &other)
     return *this;
 }
 
+/**
+ * The level left shift operator.
+ * @param os
+ * @param level
+ * @return
+ */
 std::ostream &operator<<(std::ostream &os, Level const &level)
 {
     os << std::endl << "---------------------------------------" << std::endl;

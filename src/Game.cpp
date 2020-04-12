@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <exception>
@@ -34,6 +35,10 @@ Game::~Game()
     delete this->getCurrentLevel();
 }
 
+/**
+ * The level constructor.
+ * @param other
+ */
 Game &Game::operator=(Game const &other)
 {
     if (this != &other)
@@ -45,6 +50,12 @@ Game &Game::operator=(Game const &other)
     return *this;
 }
 
+/**
+ * The game left shift operator.
+ * @param os
+ * @param game
+ * @return
+ */
 std::ostream &operator<<(std::ostream &os, Game const &game)
 {
     os << "********** GAME STATE **********" << std::endl;
@@ -80,13 +91,8 @@ bool Game::start()
  */
 bool Game::run()
 {
-    static int i = 0;
-    /* if (i == 0)
-     {*/
-    this->getDisplay()->render(this->getCurrentPlayer(), this->getCurrentLevel(),
-                               this->getDisplay()->handleEvents(this->getCurrentPlayer()));
-    /*   i += 1;
-   }*/
+    this->getDisplay()->handleEvents(this->getCurrentPlayer(), this->getCurrentLevel()->getLevelMap());
+    this->getDisplay()->render(this->getCurrentPlayer(), this->getCurrentLevel());
     return this->getDisplay()->isRunning();
 }
 

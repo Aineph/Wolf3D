@@ -4,8 +4,10 @@
  */
 
 #include <iostream>
+#include <vector>
 #include <cmath>
 #include "Position.hh"
+#include "Level.hh"
 #include "Player.hh"
 
 /**
@@ -29,6 +31,11 @@ Player::Player(Player const &other)
     this->setPlayerViewField(other.getPlayerViewField());
 }
 
+/**
+ * The player left shift operator.
+ * @param other
+ * @return
+ */
 Player &Player::operator=(Player const &other)
 {
     if (this != &other)
@@ -40,6 +47,12 @@ Player &Player::operator=(Player const &other)
     return *this;
 }
 
+/**
+ * The player left shift operator.
+ * @param os
+ * @param player
+ * @return
+ */
 std::ostream &operator<<(std::ostream &os, Player const &player)
 {
     os << std::endl << "----------------------------------------" << std::endl;
@@ -55,13 +68,15 @@ std::ostream &operator<<(std::ostream &os, Player const &player)
  * Moves the player forward.
  * @return
  */
-bool Player::moveForward()
+bool Player::moveForward(std::vector<std::vector<int>> const &levelMap)
 {
     Position currentPosition = this->getPosition();
 
-    currentPosition.setPositionX(currentPosition.getPositionX() + (currentPosition.getDirectionX() / 10));
-    currentPosition.setPositionY(currentPosition.getPositionY() + (currentPosition.getDirectionY() / 10));
-    this->setPosition(currentPosition);
+    currentPosition.setPositionX(currentPosition.getPositionX() + (currentPosition.getDirectionX() / 20));
+    currentPosition.setPositionY(currentPosition.getPositionY() + (currentPosition.getDirectionY() / 20));
+    if (levelMap[currentPosition.getPositionY() / POSITION_UNIT_Y][currentPosition.getPositionX() / POSITION_UNIT_X] !=
+        Level::BLOCK_STANDARD_WALL)
+        this->setPosition(currentPosition);
     return true;
 }
 
@@ -69,13 +84,15 @@ bool Player::moveForward()
  * Moves the player backward.
  * @return
  */
-bool Player::moveBackward()
+bool Player::moveBackward(std::vector<std::vector<int>> const &levelMap)
 {
     Position currentPosition = this->getPosition();
 
-    currentPosition.setPositionX(currentPosition.getPositionX() - (currentPosition.getDirectionX() / 10));
-    currentPosition.setPositionY(currentPosition.getPositionY() - (currentPosition.getDirectionY() / 10));
-    this->setPosition(currentPosition);
+    currentPosition.setPositionX(currentPosition.getPositionX() - (currentPosition.getDirectionX() / 20));
+    currentPosition.setPositionY(currentPosition.getPositionY() - (currentPosition.getDirectionY() / 20));
+    if (levelMap[currentPosition.getPositionY() / POSITION_UNIT_Y][currentPosition.getPositionX() / POSITION_UNIT_X] !=
+        Level::BLOCK_STANDARD_WALL)
+        this->setPosition(currentPosition);
     return true;
 }
 
@@ -87,14 +104,14 @@ bool Player::rotateLeft()
 {
     Position currentPosition = this->getPosition();
 
-    currentPosition.setDirectionX((currentPosition.getDirectionX() * std::cos(-(M_PI / 24)) -
-                                   currentPosition.getDirectionY() * std::sin(-(M_PI / 24))));
-    currentPosition.setDirectionY((this->getPosition().getDirectionX() * std::sin(-(M_PI / 24)) +
-                                   currentPosition.getDirectionY() * std::cos(-(M_PI / 24))));
-    currentPosition.setPlaneX((currentPosition.getPlaneX() * std::cos(-(M_PI / 24)) -
-                               currentPosition.getPlaneY() * std::sin(-(M_PI / 24))));
-    currentPosition.setPlaneY((this->getPosition().getPlaneX() * std::sin(-(M_PI / 24)) +
-                               currentPosition.getPlaneY() * std::cos(-(M_PI / 24))));
+    currentPosition.setDirectionX(static_cast<long>(currentPosition.getDirectionX() * std::cos(-(M_PI / 48)) -
+                                                    currentPosition.getDirectionY() * std::sin(-(M_PI / 48))));
+    currentPosition.setDirectionY(static_cast<long>(this->getPosition().getDirectionX() * std::sin(-(M_PI / 48)) +
+                                                    currentPosition.getDirectionY() * std::cos(-(M_PI / 48))));
+    currentPosition.setPlaneX(static_cast<long>(currentPosition.getPlaneX() * std::cos(-(M_PI / 48)) -
+                                                currentPosition.getPlaneY() * std::sin(-(M_PI / 48))));
+    currentPosition.setPlaneY(static_cast<long>(this->getPosition().getPlaneX() * std::sin(-(M_PI / 48)) +
+                                                currentPosition.getPlaneY() * std::cos(-(M_PI / 48))));
     this->setPosition(currentPosition);
     return true;
 }
@@ -107,14 +124,14 @@ bool Player::rotateRight()
 {
     Position currentPosition = this->getPosition();
 
-    currentPosition.setDirectionX((currentPosition.getDirectionX() * std::cos(M_PI / 24) -
-                                   currentPosition.getDirectionY() * std::sin(M_PI / 24)));
-    currentPosition.setDirectionY((this->getPosition().getDirectionX() * std::sin(M_PI / 24) +
-                                   currentPosition.getDirectionY() * std::cos(M_PI / 24)));
-    currentPosition.setPlaneX(
-            (currentPosition.getPlaneX() * std::cos(M_PI / 24) - currentPosition.getPlaneY() * std::sin(M_PI / 24)));
-    currentPosition.setPlaneY(
-            (this->getPosition().getPlaneX() * std::sin(M_PI / 24) + currentPosition.getPlaneY() * std::cos(M_PI / 24)));
+    currentPosition.setDirectionX(static_cast<long>(currentPosition.getDirectionX() * std::cos(M_PI / 48) -
+                                                    currentPosition.getDirectionY() * std::sin(M_PI / 48)));
+    currentPosition.setDirectionY(static_cast<long>(this->getPosition().getDirectionX() * std::sin(M_PI / 48) +
+                                                    currentPosition.getDirectionY() * std::cos(M_PI / 48)));
+    currentPosition.setPlaneX(static_cast<long>(currentPosition.getPlaneX() * std::cos(M_PI / 48) -
+                                                currentPosition.getPlaneY() * std::sin(M_PI / 48)));
+    currentPosition.setPlaneY(static_cast<long>(this->getPosition().getPlaneX() * std::sin(M_PI / 48) +
+                                                currentPosition.getPlaneY() * std::cos(M_PI / 48)));
     this->setPosition(currentPosition);
     return true;
 }

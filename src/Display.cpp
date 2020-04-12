@@ -5,6 +5,8 @@
 
 #include <iostream>
 #include <string>
+#include <map>
+#include <vector>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include "Position.hh"
@@ -24,6 +26,7 @@ Display::Display() : _window(), _windowTitle()
     this->setWindow(
             new sf::RenderWindow(sf::VideoMode(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT), this->getWindowTitle()));
     this->getWindow()->setFramerateLimit(60);
+    this->setEvents(std::map<sf::Keyboard::Key, bool>());
 }
 
 /**
@@ -45,7 +48,13 @@ Display *Display::getInstance()
     return Display::_instance;
 }
 
-bool Display::render(Player *player, Level *level, bool log)
+/**
+ * Renders the level content on the screen.
+ * @param player
+ * @param level
+ * @return
+ */
+bool Display::render(Player *player, Level *level)
 {
     RayCaster rayCaster;
     Position rayPosition;
@@ -65,7 +74,7 @@ bool Display::render(Player *player, Level *level, bool log)
         rayPosition.setDirectionY(player->getPosition().getDirectionY() +
                                   ((player->getPosition().getPlaneY() * cameraPosition) / POSITION_UNIT_Y));
         rayCaster.setRayPosition(rayPosition);
-        wallHeight = rayCaster.render(player->getPosition(), level->getLevelMap(), log);
+        wallHeight = rayCaster.render(player->getPosition(), level->getLevelMap());
         this->renderColumn(x, windowDimensions.y, wallHeight);
         x += 1;
     }
@@ -73,6 +82,12 @@ bool Display::render(Player *player, Level *level, bool log)
     return true;
 }
 
+/**
+ * Renders a column from the screen.
+ * @param x
+ * @param windowHeight
+ * @param wallHeight
+ */
 void Display::renderColumn(int x, int windowHeight, int wallHeight)
 {
     sf::RectangleShape line;
@@ -89,32 +104,34 @@ void Display::renderColumn(int x, int windowHeight, int wallHeight)
 
 /**
  * Handles the window events.
+ * @param player
+ * @param levelMap
  * @return
  */
-bool Display::handleEvents(Player *player)
+bool Display::handleEvents(Player *player, std::vector<std::vector<int>> const &levelMap)
 {
     auto event = sf::Event();
 
     while (this->getWindow()->pollEvent(event))
     {
         if (event.type == sf::Event::KeyPressed)
-        {
-            if (event.key.code == sf::Keyboard::Z || event.key.code == sf::Keyboard::Up)
-                player->moveForward();
-            else if (event.key.code == sf::Keyboard::S || event.key.code == sf::Keyboard::Down)
-                player->moveBackward();
-            if (event.key.code == sf::Keyboard::Q || event.key.code == sf::Keyboard::Left)
-                player->rotateLeft();
-            else if (event.key.code == sf::Keyboard::D || event.key.code == sf::Keyboard::Right)
-                player->rotateRight();
-            if (event.key.code == sf::Keyboard::Enter)
-                return true;
-        }
-        else if (event.type == sf::Event::Closed ||
-                 (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+            this->_events[event.key.code] = true;
+        else if (event.type == sf::Event::KeyReleased)
+            this->_events[event.key.code] = false;
+        else if (event.type == sf::Event::Closed)
             this->getWindow()->close();
     }
-    return false;
+    if (this->_events[sf::Keyboard::Z] || this->_events[sf::Keyboard::Up])
+        player->moveForward(levelMap);
+    if (this->_events[sf::Keyboard::S] || this->_events[sf::Keyboard::Down])
+        player->moveBackward(levelMap);
+    if (this->_events[sf::Keyboard::Q] || this->_events[sf::Keyboard::Left])
+        player->rotateLeft();
+    if (this->_events[sf::Keyboard::D] || this->_events[sf::Keyboard::Right])
+        player->rotateRight();
+    if (this->_events[sf::Keyboard::Escape])
+        this->getWindow()->close();
+    return true;
 }
 
 /**
@@ -160,4 +177,22 @@ std::string const &Display::getWindowTitle() const
 void Display::setWindowTitle(std::string const &windowTitle)
 {
     this->_windowTitle = windowTitle;
+}
+
+/**
+ * The getter for the events.
+ * @return
+ */
+std::map<sf::Keyboard::Key, bool> const &Display::getEvents() const
+{
+    return this->_events;
+}
+
+/**
+ * The setter for the events.
+ * @param events
+ */
+void Display::setEvents(const std::map<sf::Keyboard::Key, bool> &events)
+{
+    this->_events = events;
 }

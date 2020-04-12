@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <string>
+#include <map>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <exception>
@@ -14,6 +15,10 @@
 #include "Display.hh"
 #include "Game.hh"
 
+/**
+ * The main function.
+ * @return
+ */
 int main()
 {
     Game *game = new Game();
@@ -22,7 +27,7 @@ int main()
         return 1;
     while (game->run())
     {
-//        std::cout << *game << std::endl;
+        /*std::cout << *game << std::endl;*/
     }
     return 0;
 }
