@@ -23,7 +23,7 @@ public:
 
     void renderColumn(int, int, int);
 
-    bool handleEvents(Player *, std::vector<std::vector<int>> const &);
+    bool handleEvents(Player *, Level *);
 
     bool isRunning();
 
@@ -39,11 +39,16 @@ public:
 
     void setEvents(std::map<sf::Keyboard::Key, bool> const &);
 
+    sf::Clock const &getEventTimer() const;
+
+    void setEventTimer(sf::Clock const &);
+
 private:
     static Display *_instance;
     sf::RenderWindow *_window;
     std::string _windowTitle;
     std::map<sf::Keyboard::Key, bool> _events;
+    sf::Clock _eventTimer;
 
     Display();
 };

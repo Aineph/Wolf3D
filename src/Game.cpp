@@ -11,8 +11,8 @@
 #include <SFML/Window.hpp>
 #include <exception>
 #include "Position.hh"
-#include "Player.hh"
 #include "Level.hh"
+#include "Player.hh"
 #include "Display.hh"
 #include "Game.hh"
 
@@ -91,7 +91,7 @@ bool Game::start()
  */
 bool Game::run()
 {
-    this->getDisplay()->handleEvents(this->getCurrentPlayer(), this->getCurrentLevel()->getLevelMap());
+    this->getDisplay()->handleEvents(this->getCurrentPlayer(), this->getCurrentLevel());
     this->getDisplay()->render(this->getCurrentPlayer(), this->getCurrentLevel());
     return this->getDisplay()->isRunning();
 }

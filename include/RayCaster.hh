@@ -15,13 +15,13 @@ public:
 
     virtual ~RayCaster() = default;
 
-    int render(Position const &, std::vector<std::vector<int>> const &);
+    int render(Position const &, Level *);
 
     void initializeVectors(Position const &);
 
     void computeDistances(Position const &);
 
-    void cast(std::vector<std::vector<int>> const &);
+    void cast(Level *);
 
     Position const &getRayPosition() const;
 

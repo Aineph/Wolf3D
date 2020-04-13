@@ -9,10 +9,11 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+#include <SFML/System.hpp>
 #include "Position.hh"
-#include "RayCaster.hh"
 #include "Level.hh"
 #include "Player.hh"
+#include "RayCaster.hh"
 #include "Display.hh"
 
 Display *Display::_instance = nullptr;
@@ -25,8 +26,10 @@ Display::Display() : _window(), _windowTitle()
     this->setWindowTitle(DISPLAY_DEFAULT_TITLE);
     this->setWindow(
             new sf::RenderWindow(sf::VideoMode(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT), this->getWindowTitle()));
-    this->getWindow()->setFramerateLimit(60);
+    this->getWindow()->setFramerateLimit(144);
+    this->getWindow()->setVerticalSyncEnabled(true);
     this->setEvents(std::map<sf::Keyboard::Key, bool>());
+    this->setEventTimer(sf::Clock());
 }
 
 /**
@@ -60,7 +63,7 @@ bool Display::render(Player *player, Level *level)
     Position rayPosition;
     sf::Vector2u windowDimensions = this->getWindow()->getSize();
     int cameraPosition = 0;
-    int wallHeight = 0;
+    int wallDistance = 0;
     int x = 0;
 
     this->getWindow()->clear(sf::Color::Black);
@@ -74,8 +77,8 @@ bool Display::render(Player *player, Level *level)
         rayPosition.setDirectionY(player->getPosition().getDirectionY() +
                                   ((player->getPosition().getPlaneY() * cameraPosition) / POSITION_UNIT_Y));
         rayCaster.setRayPosition(rayPosition);
-        wallHeight = rayCaster.render(player->getPosition(), level->getLevelMap());
-        this->renderColumn(x, windowDimensions.y, wallHeight);
+        wallDistance = rayCaster.render(player->getPosition(), level);
+        this->renderColumn(x, windowDimensions.y, wallDistance);
         x += 1;
     }
     this->getWindow()->display();
@@ -88,18 +91,35 @@ bool Display::render(Player *player, Level *level)
  * @param windowHeight
  * @param wallHeight
  */
-void Display::renderColumn(int x, int windowHeight, int wallHeight)
+void Display::renderColumn(int x, int windowHeight, int wallDistance)
 {
-    sf::RectangleShape line;
+    sf::RectangleShape sky;
+    sf::RectangleShape wall;
+    sf::RectangleShape floor;
+    sf::Color wallColor;
     int wallSize = 0;
+    float wallPosition;
 
-    if (wallHeight == 0)
+    if (wallDistance == 0)
         wallSize = windowHeight;
     else
-        wallSize = (windowHeight * POSITION_UNIT_Y) / wallHeight;
-    line = sf::RectangleShape(sf::Vector2f(1, wallSize));
-    line.setPosition(x, (static_cast<float>(windowHeight) / 2) - (static_cast<float>(wallSize) / 2));
-    this->getWindow()->draw(line);
+        wallSize = (windowHeight * POSITION_UNIT_Y) / wallDistance;
+    wallPosition = (static_cast<float>(windowHeight) / 2) - (static_cast<float>(wallSize) / 2);
+    sky = sf::RectangleShape(sf::Vector2f(1, wallPosition));
+    sky.setFillColor(sf::Color(0, 0, 128));
+    sky.setPosition(x, 0);
+    wall = sf::RectangleShape(sf::Vector2f(1, wallSize));
+    wallColor.r = (std::min(windowHeight, wallSize) * 255) / windowHeight;
+    wallColor.g = (std::min(windowHeight, wallSize) * 255) / windowHeight;
+    wallColor.b = (std::min(windowHeight, wallSize) * 255) / windowHeight;
+    wall.setFillColor(wallColor);
+    wall.setPosition(x, wallPosition);
+    floor = sf::RectangleShape(sf::Vector2f(1, wallPosition));
+    floor.setFillColor(sf::Color(0, 128, 0));
+    floor.setPosition(x, wallPosition + wallSize);
+    this->getWindow()->draw(sky);
+    this->getWindow()->draw(wall);
+    this->getWindow()->draw(floor);
 }
 
 /**
@@ -108,9 +128,10 @@ void Display::renderColumn(int x, int windowHeight, int wallHeight)
  * @param levelMap
  * @return
  */
-bool Display::handleEvents(Player *player, std::vector<std::vector<int>> const &levelMap)
+bool Display::handleEvents(Player *player, Level *level)
 {
     auto event = sf::Event();
+    sf::Clock currentTimer = this->getEventTimer();
 
     while (this->getWindow()->pollEvent(event))
     {
@@ -121,14 +142,19 @@ bool Display::handleEvents(Player *player, std::vector<std::vector<int>> const &
         else if (event.type == sf::Event::Closed)
             this->getWindow()->close();
     }
-    if (this->_events[sf::Keyboard::Z] || this->_events[sf::Keyboard::Up])
-        player->moveForward(levelMap);
-    if (this->_events[sf::Keyboard::S] || this->_events[sf::Keyboard::Down])
-        player->moveBackward(levelMap);
-    if (this->_events[sf::Keyboard::Q] || this->_events[sf::Keyboard::Left])
-        player->rotateLeft();
-    if (this->_events[sf::Keyboard::D] || this->_events[sf::Keyboard::Right])
-        player->rotateRight();
+    if (currentTimer.getElapsedTime().asMicroseconds() >= 10000)
+    {
+        if (this->_events[sf::Keyboard::Z] || this->_events[sf::Keyboard::Up])
+            player->moveForward(level);
+        if (this->_events[sf::Keyboard::S] || this->_events[sf::Keyboard::Down])
+            player->moveBackward(level);
+        if (this->_events[sf::Keyboard::Q] || this->_events[sf::Keyboard::Left])
+            player->rotateLeft();
+        if (this->_events[sf::Keyboard::D] || this->_events[sf::Keyboard::Right])
+            player->rotateRight();
+        currentTimer.restart();
+        this->setEventTimer(currentTimer);
+    }
     if (this->_events[sf::Keyboard::Escape])
         this->getWindow()->close();
     return true;
@@ -195,4 +221,22 @@ std::map<sf::Keyboard::Key, bool> const &Display::getEvents() const
 void Display::setEvents(const std::map<sf::Keyboard::Key, bool> &events)
 {
     this->_events = events;
+}
+
+/**
+ * The getter for the event timer.
+ * @return
+ */
+sf::Clock const &Display::getEventTimer() const
+{
+    return this->_eventTimer;
+}
+
+/**
+ * The setter for the event timer.
+ * @param eventTimer
+ */
+void Display::setEventTimer(sf::Clock const &eventTimer)
+{
+    this->_eventTimer = eventTimer;
 }

@@ -17,8 +17,9 @@ Level::Level()
 {
     this->setLevelName(LEVEL_DEFAULT_NAME);
     this->setLevelFile(LEVEL_DEFAULT_FILE);
+    this->setLevelWidth(0);
+    this->setLevelHeight(0);
     this->setLevelMap(std::vector<std::vector<int>>());
-    this->setLevelWallsHeight(LEVEL_DEFAULT_HEIGHT);
 }
 
 /**
@@ -29,8 +30,9 @@ Level::Level(Level const &other)
 {
     this->setLevelName(other.getLevelName());
     this->setLevelFile(other.getLevelFile());
+    this->setLevelWidth(other.getLevelWidth());
+    this->setLevelHeight(other.getLevelHeight());
     this->setLevelMap(other.getLevelMap());
-    this->setLevelWallsHeight(other.getLevelWallsHeight());
 }
 
 /**
@@ -45,7 +47,6 @@ Level &Level::operator=(Level const &other)
         this->setLevelName(other.getLevelName());
         this->setLevelFile(other.getLevelFile());
         this->setLevelMap(other.getLevelMap());
-        this->setLevelWallsHeight(other.getLevelWallsHeight());
     }
     return *this;
 }
@@ -62,6 +63,8 @@ std::ostream &operator<<(std::ostream &os, Level const &level)
     os << "This is the state of the current level." << std::endl;
     os << "Level Name: " << level.getLevelName() << std::endl;
     os << "Level File: " << level.getLevelFile() << std::endl;
+    os << "Level Width: " << level.getLevelWidth() << std::endl;
+    os << "Level Height: " << level.getLevelHeight() << std::endl;
     for (auto &row : level.getLevelMap())
     {
         for (auto &column : row)
@@ -70,7 +73,6 @@ std::ostream &operator<<(std::ostream &os, Level const &level)
         }
         os << std::endl;
     }
-    os << "Level Wall Heights: " << level.getLevelWallsHeight() << std::endl;
     os << "---------------------------------------" << std::endl;
     return os;
 }
@@ -135,6 +137,8 @@ Position Level::loadLevelMap()
         this->_levelMap.push_back(levelMapLine);
         currentRow += 1;
     }
+    this->setLevelWidth(currentColumn);
+    this->setLevelHeight(currentRow);
     return startPosition;
 }
 
@@ -174,14 +178,40 @@ void Level::setLevelFile(std::string const &levelFile)
     this->_levelFile = levelFile;
 }
 
-int Level::getLevelWallsHeight() const
+/**
+ * The getter for the level width.
+ * @return
+ */
+int Level::getLevelWidth() const
 {
-    return this->_levelWallsHeight;
+    return this->_levelWidth;
 }
 
-void Level::setLevelWallsHeight(int levelWallsHeight)
+/**
+ * The setter for the level width.
+ * @param levelWidth
+ */
+void Level::setLevelWidth(int levelWidth)
 {
-    this->_levelWallsHeight = levelWallsHeight;
+    this->_levelWidth = levelWidth;
+}
+
+/**
+ * The getter for the level height.
+ * @return
+ */
+int Level::getLevelHeight() const
+{
+    return this->_levelHeight;
+}
+
+/**
+ * The setter for the level height.
+ * @param levelHeight
+ */
+void Level::setLevelHeight(int levelHeight)
+{
+    this->_levelHeight = levelHeight;
 }
 
 /**

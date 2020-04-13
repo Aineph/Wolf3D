@@ -10,8 +10,8 @@
 #include <SFML/Window.hpp>
 #include <exception>
 #include "Position.hh"
-#include "Player.hh"
 #include "Level.hh"
+#include "Player.hh"
 #include "Display.hh"
 #include "Game.hh"
 

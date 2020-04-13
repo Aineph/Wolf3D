@@ -11,8 +11,6 @@
 #define LEVEL_DEFAULT_NAME "Default Level"
 #define LEVEL_DEFAULT_FILE "../levels/default.lvl"
 
-#define LEVEL_DEFAULT_HEIGHT 300 * POSITION_UNIT_HEIGHT
-
 class Level
 {
 public:
@@ -46,9 +44,13 @@ public:
 
     void setLevelFile(std::string const &);
 
-    int getLevelWallsHeight() const;
+    int getLevelWidth() const;
 
-    void setLevelWallsHeight(int);
+    void setLevelWidth(int);
+
+    int getLevelHeight() const;
+
+    void setLevelHeight(int);
 
     std::vector<std::vector<int>> const &getLevelMap() const;
 
@@ -57,7 +59,8 @@ public:
 private:
     std::string _levelName;
     std::string _levelFile;
-    int _levelWallsHeight;
+    int _levelWidth;
+    int _levelHeight;
     std::vector<std::vector<int>> _levelMap;
 };
 

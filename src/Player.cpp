@@ -16,8 +16,6 @@
 Player::Player()
 {
     this->setPosition(Position());
-    this->setPlayerHeight(PLAYER_DEFAULT_HEIGHT);
-    this->setPlayerViewField(PLAYER_DEFAULT_VIEWFIELD);
 }
 
 /**
@@ -27,8 +25,6 @@ Player::Player()
 Player::Player(Player const &other)
 {
     this->setPosition(other.getPosition());
-    this->setPlayerHeight(other.getPlayerHeight());
-    this->setPlayerViewField(other.getPlayerViewField());
 }
 
 /**
@@ -39,11 +35,7 @@ Player::Player(Player const &other)
 Player &Player::operator=(Player const &other)
 {
     if (this != &other)
-    {
         this->setPosition(other.getPosition());
-        this->setPlayerHeight(other.getPlayerHeight());
-        this->setPlayerViewField(other.getPlayerViewField());
-    }
     return *this;
 }
 
@@ -58,41 +50,83 @@ std::ostream &operator<<(std::ostream &os, Player const &player)
     os << std::endl << "----------------------------------------" << std::endl;
     os << "This is the state of the current player." << std::endl;
     os << player.getPosition() << std::endl;
-    os << "Player Height: " << player.getPlayerHeight() << std::endl;
-    os << "Player View Field: " << player.getPlayerViewField() << std::endl;
     os << "----------------------------------------" << std::endl;
     return os;
 }
 
 /**
  * Moves the player forward.
+ * @param level
  * @return
  */
-bool Player::moveForward(std::vector<std::vector<int>> const &levelMap)
+bool Player::moveForward(Level *level)
 {
     Position currentPosition = this->getPosition();
+    long newPositionX = 0;
+    long newPositionY = 0;
+    long currentPositionX = 0;
+    long currentPositionY = 0;
+    long positionX = 0;
+    long positionY = 0;
 
-    currentPosition.setPositionX(currentPosition.getPositionX() + (currentPosition.getDirectionX() / 20));
-    currentPosition.setPositionY(currentPosition.getPositionY() + (currentPosition.getDirectionY() / 20));
-    if (levelMap[currentPosition.getPositionY() / POSITION_UNIT_Y][currentPosition.getPositionX() / POSITION_UNIT_X] !=
-        Level::BLOCK_STANDARD_WALL)
-        this->setPosition(currentPosition);
+    currentPositionX = currentPosition.getPositionX() / POSITION_UNIT_X;
+    currentPositionY = currentPosition.getPositionY() / POSITION_UNIT_Y;
+    newPositionX = currentPosition.getPositionX() + (currentPosition.getDirectionX() / 20);
+    newPositionY = currentPosition.getPositionY() + (currentPosition.getDirectionY() / 20);
+    positionX = newPositionX / POSITION_UNIT_X;
+    positionY = newPositionY / POSITION_UNIT_Y;
+    if (positionX < level->getLevelWidth() && positionX >= 0 && positionY < level->getLevelHeight() && positionY >= 0 &&
+        level->getLevelMap()[positionY][positionX] != Level::BLOCK_STANDARD_WALL)
+    {
+        currentPosition.setPositionX(newPositionX);
+        currentPosition.setPositionY(newPositionY);
+    }
+    else if (currentPositionX < level->getLevelWidth() && currentPositionX >= 0 &&
+             positionY < level->getLevelHeight() && positionY >= 0 &&
+             level->getLevelMap()[positionY][currentPositionX] != Level::BLOCK_STANDARD_WALL)
+        currentPosition.setPositionY(newPositionY);
+    else if (positionX < level->getLevelWidth() && positionX >= 0 && currentPositionY < level->getLevelHeight() &&
+             currentPositionY >= 0 && level->getLevelMap()[currentPositionY][positionX] != Level::BLOCK_STANDARD_WALL)
+        currentPosition.setPositionX(newPositionX);
+    this->setPosition(currentPosition);
     return true;
 }
 
 /**
  * Moves the player backward.
+ * @param level
  * @return
  */
-bool Player::moveBackward(std::vector<std::vector<int>> const &levelMap)
+bool Player::moveBackward(Level *level)
 {
     Position currentPosition = this->getPosition();
+    long newPositionX = 0;
+    long newPositionY = 0;
+    long currentPositionX = 0;
+    long currentPositionY = 0;
+    long positionX = 0;
+    long positionY = 0;
 
-    currentPosition.setPositionX(currentPosition.getPositionX() - (currentPosition.getDirectionX() / 20));
-    currentPosition.setPositionY(currentPosition.getPositionY() - (currentPosition.getDirectionY() / 20));
-    if (levelMap[currentPosition.getPositionY() / POSITION_UNIT_Y][currentPosition.getPositionX() / POSITION_UNIT_X] !=
-        Level::BLOCK_STANDARD_WALL)
-        this->setPosition(currentPosition);
+    currentPositionX = currentPosition.getPositionX() / POSITION_UNIT_X;
+    currentPositionY = currentPosition.getPositionY() / POSITION_UNIT_Y;
+    newPositionX = currentPosition.getPositionX() - (currentPosition.getDirectionX() / 20);
+    newPositionY = currentPosition.getPositionY() - (currentPosition.getDirectionY() / 20);
+    positionX = newPositionX / POSITION_UNIT_X;
+    positionY = newPositionY / POSITION_UNIT_Y;
+    if (positionX < level->getLevelWidth() && positionX >= 0 && positionY < level->getLevelHeight() && positionY >= 0 &&
+        level->getLevelMap()[positionY][positionX] != Level::BLOCK_STANDARD_WALL)
+    {
+        currentPosition.setPositionX(newPositionX);
+        currentPosition.setPositionY(newPositionY);
+    }
+    else if (currentPositionX < level->getLevelWidth() && currentPositionX >= 0 &&
+             positionY < level->getLevelHeight() && positionY >= 0 &&
+             level->getLevelMap()[positionY][currentPositionX] != Level::BLOCK_STANDARD_WALL)
+        currentPosition.setPositionY(newPositionY);
+    else if (positionX < level->getLevelWidth() && positionX >= 0 && currentPositionY < level->getLevelHeight() &&
+             currentPositionY >= 0 && level->getLevelMap()[currentPositionY][positionX] != Level::BLOCK_STANDARD_WALL)
+        currentPosition.setPositionX(newPositionX);
+    this->setPosition(currentPosition);
     return true;
 }
 
@@ -152,40 +186,4 @@ Position const &Player::getPosition() const
 void Player::setPosition(Position const &position)
 {
     this->_position = position;
-}
-
-/**
- * The getter for the player height.
- * @return
- */
-int Player::getPlayerHeight() const
-{
-    return this->_playerHeight;
-}
-
-/**
- * The setter for the player height.
- * @param height
- */
-void Player::setPlayerHeight(int height)
-{
-    this->_playerHeight = height;
-}
-
-/**
- * The getter for the player view field.
- * @return
- */
-int Player::getPlayerViewField() const
-{
-    return this->_playerViewField;
-}
-
-/**
- * The setter for the player view field.
- * @param viewField
- */
-void Player::setPlayerViewField(int viewField)
-{
-    this->_playerViewField = viewField;
 }
