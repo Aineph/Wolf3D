@@ -9,7 +9,7 @@
 #include <SFML/System.hpp>
 
 #define LEVEL_DEFAULT_NAME "Default Level"
-#define LEVEL_DEFAULT_FILE "../levels/default.lvl"
+#define LEVEL_DEFAULT_FILE "../levels/test.lvl"
 
 class Level
 {
