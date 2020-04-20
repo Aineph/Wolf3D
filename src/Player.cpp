@@ -28,7 +28,7 @@ Player::Player(Player const &other)
 }
 
 /**
- * The player left shift operator.
+ * The player equal operator.
  * @param other
  * @return
  */
@@ -76,17 +76,17 @@ bool Player::moveForward(Level *level)
     positionX = newPositionX / POSITION_UNIT_X;
     positionY = newPositionY / POSITION_UNIT_Y;
     if (positionX < level->getLevelWidth() && positionX >= 0 && positionY < level->getLevelHeight() && positionY >= 0 &&
-        level->getLevelMap()[positionY][positionX] != Level::BLOCK_STANDARD_WALL)
+        !Level::isLevelWall(level->getLevelMap()[positionY][positionX]))
     {
         currentPosition.setPositionX(newPositionX);
         currentPosition.setPositionY(newPositionY);
     }
     else if (currentPositionX < level->getLevelWidth() && currentPositionX >= 0 &&
              positionY < level->getLevelHeight() && positionY >= 0 &&
-             level->getLevelMap()[positionY][currentPositionX] != Level::BLOCK_STANDARD_WALL)
+             !Level::isLevelWall(level->getLevelMap()[positionY][currentPositionX]))
         currentPosition.setPositionY(newPositionY);
     else if (positionX < level->getLevelWidth() && positionX >= 0 && currentPositionY < level->getLevelHeight() &&
-             currentPositionY >= 0 && level->getLevelMap()[currentPositionY][positionX] != Level::BLOCK_STANDARD_WALL)
+             currentPositionY >= 0 && !Level::isLevelWall(level->getLevelMap()[currentPositionY][positionX]))
         currentPosition.setPositionX(newPositionX);
     this->setPosition(currentPosition);
     return true;
@@ -114,17 +114,17 @@ bool Player::moveBackward(Level *level)
     positionX = newPositionX / POSITION_UNIT_X;
     positionY = newPositionY / POSITION_UNIT_Y;
     if (positionX < level->getLevelWidth() && positionX >= 0 && positionY < level->getLevelHeight() && positionY >= 0 &&
-        level->getLevelMap()[positionY][positionX] != Level::BLOCK_STANDARD_WALL)
+        !Level::isLevelWall(level->getLevelMap()[positionY][positionX]))
     {
         currentPosition.setPositionX(newPositionX);
         currentPosition.setPositionY(newPositionY);
     }
     else if (currentPositionX < level->getLevelWidth() && currentPositionX >= 0 &&
              positionY < level->getLevelHeight() && positionY >= 0 &&
-             level->getLevelMap()[positionY][currentPositionX] != Level::BLOCK_STANDARD_WALL)
+             !Level::isLevelWall(level->getLevelMap()[positionY][currentPositionX]))
         currentPosition.setPositionY(newPositionY);
     else if (positionX < level->getLevelWidth() && positionX >= 0 && currentPositionY < level->getLevelHeight() &&
-             currentPositionY >= 0 && level->getLevelMap()[currentPositionY][positionX] != Level::BLOCK_STANDARD_WALL)
+             currentPositionY >= 0 && !Level::isLevelWall(level->getLevelMap()[currentPositionY][positionX]))
         currentPosition.setPositionX(newPositionX);
     this->setPosition(currentPosition);
     return true;

@@ -12,7 +12,8 @@ set(PROJECT_SRCS
         include/Game.hh
         src/Player.cpp
         src/Position.cpp
-        src/RayCaster.cpp)
+        src/RayCaster.cpp
+        src/Ray.cpp)
 
 # Defining the project.
 

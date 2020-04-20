@@ -9,52 +9,32 @@
 class RayCaster
 {
 public:
-    RayCaster();
+    RayCaster(sf::RenderWindow *);
 
     RayCaster(RayCaster const &);
 
     virtual ~RayCaster() = default;
 
-    int render(Position const &, Level *);
+    void compute(Position const &, Level *, std::map<Level::BlockType, sf::Texture *> const &, Display::DisplayType);
 
-    void initializeVectors(Position const &);
-
-    void computeDistances(Position const &);
-
-    void cast(Level *);
+    void initialize(int, Position const &);
 
     Position const &getRayPosition() const;
 
     void setRayPosition(Position const &);
 
-    sf::Vector2i const &getDeltaDistance() const;
+    sf::RenderWindow *getWindow() const;
 
-    void setDeltaDistance(sf::Vector2i const &);
+    void setWindow(sf::RenderWindow *);
 
-    sf::Vector2i const &getSideDistance() const;
+    sf::Vector2u const &getWindowSize() const;
 
-    void setSideDistance(sf::Vector2i const &);
-
-    sf::Vector2i const &getSteps() const;
-
-    void setSteps(sf::Vector2i const &);
-
-    int getHitDirection() const;
-
-    void setHitDirection(int);
-
-    int getPreviousWallDistance() const;
-
-    void setPreviousWallDistance(int);
+    void setWindowSize(sf::Vector2u const &);
 
 private:
     Position _rayPosition;
-    sf::Vector2i _deltaDistance;
-    sf::Vector2i _sideDistance;
-    sf::Vector2i _steps;
-    int _previousWallDistance;
-    int _hitDirection;
+    sf::RenderWindow *_window;
+    sf::Vector2u _windowSize;
 };
-
 
 #endif //WOLF3D_RAYCASTER_HH

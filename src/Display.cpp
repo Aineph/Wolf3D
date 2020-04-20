@@ -8,29 +8,35 @@
 #include <map>
 #include <vector>
 #include <cmath>
+#include <exception>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 #include "Position.hh"
 #include "Level.hh"
 #include "Player.hh"
-#include "RayCaster.hh"
 #include "Display.hh"
+#include "Ray.hh"
+#include "RayCaster.hh"
 
 Display *Display::_instance = nullptr;
 
 /**
  * The display constructor.
  */
-Display::Display() : _window(), _windowTitle()
+Display::Display()
 {
     this->setWindowTitle(DISPLAY_DEFAULT_TITLE);
     this->setWindow(
             new sf::RenderWindow(sf::VideoMode(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT), this->getWindowTitle()));
     this->getWindow()->setFramerateLimit(144);
     this->getWindow()->setVerticalSyncEnabled(true);
+    this->setDisplayType(DisplayType::DISPLAY_TEXTURED);
     this->setEvents(std::map<sf::Keyboard::Key, bool>());
+    this->setTextures(std::map<Level::BlockType, sf::Texture *>());
     this->setEventTimer(sf::Clock());
+    if (!this->loadTextures())
+        throw std::exception();
 }
 
 /**
@@ -39,6 +45,8 @@ Display::Display() : _window(), _windowTitle()
 Display::~Display()
 {
     delete this->getWindow();
+    for (auto &texture : this->getTextures())
+        delete texture.second;
 }
 
 /**
@@ -53,6 +61,36 @@ Display *Display::getInstance()
 }
 
 /**
+ * Loads the wall textures.
+ * @return
+ */
+bool Display::loadTextures()
+{
+    std::map<Level::BlockType, sf::Texture *> textures = this->getTextures();
+
+    textures[Level::BLOCK_STANDARD_WALL] = new sf::Texture();
+    if (!textures[Level::BLOCK_STANDARD_WALL]->loadFromFile(TEXTURE_STANDARD_WALL))
+    {
+        delete textures[Level::BLOCK_STANDARD_WALL];
+        return false;
+    }
+    textures[Level::BLOCK_EAGLE_WALL] = new sf::Texture();
+    if (!textures[Level::BLOCK_EAGLE_WALL]->loadFromFile(TEXTURE_EAGLE_WALL))
+    {
+        delete textures[Level::BLOCK_EAGLE_WALL];
+        return false;
+    }
+    textures[Level::BLOCK_WOODEN_WALL] = new sf::Texture();
+    if (!textures[Level::BLOCK_WOODEN_WALL]->loadFromFile(TEXTURE_WOODEN_WALL))
+    {
+        delete textures[Level::BLOCK_WOODEN_WALL];
+        return false;
+    }
+    this->setTextures(textures);
+    return true;
+}
+
+/**
  * Renders the level content on the screen.
  * @param player
  * @param level
@@ -60,68 +98,13 @@ Display *Display::getInstance()
  */
 bool Display::render(Player *player, Level *level)
 {
-    RayCaster rayCaster;
-    Position rayPosition;
-    sf::Vector2u windowDimensions = this->getWindow()->getSize();
-    int cameraPosition = 0;
-    int wallDistance = 0;
-    int x = 0;
+    RayCaster rayCaster(this->getWindow());
 
     this->getWindow()->clear(sf::Color::Black);
-    while (x < windowDimensions.x)
-    {
-        cameraPosition = (((2 * x) * POSITION_UNIT_X) / windowDimensions.x) - POSITION_UNIT_X;
-        rayPosition.setPositionX((player->getPosition().getPositionX() / POSITION_UNIT_X) * POSITION_UNIT_X);
-        rayPosition.setPositionY((player->getPosition().getPositionY() / POSITION_UNIT_Y) * POSITION_UNIT_Y);
-        rayPosition.setDirectionX(player->getPosition().getDirectionX() +
-                                  ((player->getPosition().getPlaneX() * cameraPosition) / POSITION_UNIT_X));
-        rayPosition.setDirectionY(player->getPosition().getDirectionY() +
-                                  ((player->getPosition().getPlaneY() * cameraPosition) / POSITION_UNIT_Y));
-        rayCaster.setRayPosition(rayPosition);
-        wallDistance = rayCaster.render(player->getPosition(), level);
-        this->renderColumn(x, windowDimensions.y, wallDistance);
-        x += 1;
-    }
+    rayCaster.compute(player->getPosition(), level, this->getTextures(), this->getDisplayType());
     this->renderMap(player, level);
     this->getWindow()->display();
     return true;
-}
-
-/**
- * Renders a column from the screen.
- * @param x
- * @param windowHeight
- * @param wallHeight
- */
-void Display::renderColumn(int x, int windowHeight, int wallDistance)
-{
-    sf::RectangleShape sky;
-    sf::RectangleShape wall;
-    sf::RectangleShape floor;
-    sf::Color wallColor;
-    int wallSize = 0;
-    float wallPosition;
-
-    if (wallDistance == 0)
-        wallSize = windowHeight;
-    else
-        wallSize = (windowHeight * POSITION_UNIT_Y) / wallDistance;
-    wallPosition = (static_cast<float>(windowHeight) / 2) - (static_cast<float>(wallSize) / 2);
-    sky = sf::RectangleShape(sf::Vector2f(1, wallPosition));
-    sky.setFillColor(sf::Color::Blue);
-    sky.setPosition(x, 0);
-    wall = sf::RectangleShape(sf::Vector2f(1, wallSize));
-    wallColor.r = (std::min(windowHeight, wallSize) * 255) / windowHeight;
-    wallColor.g = (std::min(windowHeight, wallSize) * 255) / windowHeight;
-    wallColor.b = (std::min(windowHeight, wallSize) * 255) / windowHeight;
-    wall.setFillColor(wallColor);
-    wall.setPosition(x, wallPosition);
-    floor = sf::RectangleShape(sf::Vector2f(1, wallPosition));
-    floor.setFillColor(sf::Color::Green);
-    floor.setPosition(x, wallPosition + wallSize);
-    this->getWindow()->draw(sky);
-    this->getWindow()->draw(wall);
-    this->getWindow()->draw(floor);
 }
 
 /**
@@ -148,7 +131,7 @@ void Display::renderMap(Player *player, Level *level)
         mapPosX = windowDimensions.x - mapSizeX;
         for (auto &block : row)
         {
-            if (block == Level::BlockType::BLOCK_STANDARD_WALL)
+            if (Level::isLevelWall(block))
             {
                 rectangleShape = sf::RectangleShape(
                         sf::Vector2f(mapSizeX / level->getLevelWidth(), mapSizeY / level->getLevelHeight()));
@@ -190,13 +173,25 @@ bool Display::handleEvents(Player *player, Level *level)
     while (this->getWindow()->pollEvent(event))
     {
         if (event.type == sf::Event::KeyPressed)
-            this->_events[event.key.code] = true;
+        {
+            if (event.key.code == sf::Keyboard::T)
+            {
+                if (this->getDisplayType() == Display::DisplayType::DISPLAY_TEXTURED)
+                    this->setDisplayType(Display::DisplayType::DISPLAY_VANILLA);
+                else
+                    this->setDisplayType(Display::DisplayType::DISPLAY_TEXTURED);
+            }
+            else if (event.key.code == sf::Keyboard::Escape)
+                this->getWindow()->close();
+            else
+                this->_events[event.key.code] = true;
+        }
         else if (event.type == sf::Event::KeyReleased)
             this->_events[event.key.code] = false;
         else if (event.type == sf::Event::Closed)
             this->getWindow()->close();
     }
-    if (currentTimer.getElapsedTime().asMicroseconds() >= 10000)
+    if (currentTimer.getElapsedTime().asMicroseconds() >= 0)
     {
         if (this->_events[sf::Keyboard::Z] || this->_events[sf::Keyboard::Up])
             player->moveForward(level);
@@ -209,8 +204,6 @@ bool Display::handleEvents(Player *player, Level *level)
         currentTimer.restart();
         this->setEventTimer(currentTimer);
     }
-    if (this->_events[sf::Keyboard::Escape])
-        this->getWindow()->close();
     return true;
 }
 
@@ -260,6 +253,24 @@ void Display::setWindowTitle(std::string const &windowTitle)
 }
 
 /**
+ * The getter for the display type.
+ * @return
+ */
+Display::DisplayType Display::getDisplayType() const
+{
+    return this->_displayType;
+}
+
+/**
+ * The setter for the display type.
+ * @param displayType
+ */
+void Display::setDisplayType(Display::DisplayType displayType)
+{
+    this->_displayType = displayType;
+}
+
+/**
  * The getter for the events.
  * @return
  */
@@ -275,6 +286,24 @@ std::map<sf::Keyboard::Key, bool> const &Display::getEvents() const
 void Display::setEvents(const std::map<sf::Keyboard::Key, bool> &events)
 {
     this->_events = events;
+}
+
+/**
+ * The getter for the textures.
+ * @return
+ */
+std::map<Level::BlockType, sf::Texture *> const &Display::getTextures() const
+{
+    return this->_textures;
+}
+
+/**
+ * The setter for the textures.
+ * @param textures
+ */
+void Display::setTextures(std::map<Level::BlockType, sf::Texture *> const &textures)
+{
+    this->_textures = textures;
 }
 
 /**

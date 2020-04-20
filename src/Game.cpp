@@ -36,7 +36,7 @@ Game::~Game()
 }
 
 /**
- * The level constructor.
+ * The level equal operator.
  * @param other
  */
 Game &Game::operator=(Game const &other)
@@ -73,15 +73,8 @@ bool Game::start()
 {
     Position playerPosition;
 
-    try
-    {
-        playerPosition = this->getCurrentLevel()->loadLevelMap();
-        this->getCurrentPlayer()->setPosition(playerPosition);
-    } catch (std::exception &e)
-    {
-        std::cerr << e.what() << std::endl;
-        return false;
-    }
+    playerPosition = this->getCurrentLevel()->loadLevelMap();
+    this->getCurrentPlayer()->setPosition(playerPosition);
     return true;
 }
 

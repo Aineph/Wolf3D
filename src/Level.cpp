@@ -10,6 +10,8 @@
 #include "Position.hh"
 #include "Level.hh"
 
+typedef char i;
+
 /**
  * The level constructor.
  */
@@ -36,7 +38,7 @@ Level::Level(Level const &other)
 }
 
 /**
- * The level left shift operator.
+ * The level equal operator.
  * @param other
  * @return
  */
@@ -78,6 +80,17 @@ std::ostream &operator<<(std::ostream &os, Level const &level)
 }
 
 /**
+ * Checks if a block is a wall.
+ * @param block
+ * @return
+ */
+bool Level::isLevelWall(int block)
+{
+    return static_cast<Level::BlockType>(block) == Level::BlockType::BLOCK_STANDARD_WALL ||
+           block == Level::BlockType::BLOCK_EAGLE_WALL || block == Level::BlockType::BLOCK_WOODEN_WALL;
+}
+
+/**
  * Loads the content of the current level.
  * @return
  */
@@ -97,7 +110,7 @@ Position Level::loadLevelMap()
     {
         std::vector<int> levelMapLine;
         currentColumn = 0;
-        for (auto &character : levelFileLine)
+        for (char &character : levelFileLine)
         {
             if (character == BlockType::BLOCK_START_UP || character == BlockType::BLOCK_START_RIGHT ||
                 character == BlockType::BLOCK_START_DOWN || character == BlockType::BLOCK_START_LEFT)

@@ -5,22 +5,24 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 #include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
 #include "Position.hh"
 #include "Level.hh"
+#include "Player.hh"
+#include "Display.hh"
+#include "Ray.hh"
 #include "RayCaster.hh"
 
 /**
  * The raycaster constructor.
  */
-RayCaster::RayCaster()
+RayCaster::RayCaster(sf::RenderWindow *window)
 {
     this->setRayPosition(Position());
-    this->setDeltaDistance(sf::Vector2i());
-    this->setSideDistance(sf::Vector2i());
-    this->setSteps(sf::Vector2i());
-    this->setHitDirection(0);
-    this->setPreviousWallDistance(0);
+    this->setWindow(window);
+    this->setWindowSize(window->getSize());
 }
 
 /**
@@ -30,45 +32,30 @@ RayCaster::RayCaster()
 RayCaster::RayCaster(RayCaster const &other)
 {
     this->setRayPosition(other.getRayPosition());
-    this->setDeltaDistance(other.getDeltaDistance());
-    this->setSideDistance(other.getSideDistance());
-    this->setSteps(other.getSteps());
-    this->setHitDirection(other.getHitDirection());
-    this->setPreviousWallDistance(other.getPreviousWallDistance());
+    this->setWindow(other.getWindow());
+    this->setWindowSize(other.getWindowSize());
 }
 
 /**
- * Renders the view from the player's point of view.
+ * Computes the view from the player's point of view.
  * @param playerPosition
  * @param levelMap
  */
-int RayCaster::render(Position const &playerPosition, Level *level)
+void RayCaster::compute(Position const &playerPosition, Level *level,
+                        std::map<Level::BlockType, sf::Texture *> const &textures, Display::DisplayType displayType)
 {
-    int wallDistance;
+    sf::Vector2u const &windowDimensions = this->getWindowSize();
+    int windowColumn = 0;
+    Ray currentRay;
 
-    this->initializeVectors(playerPosition);
-    this->computeDistances(playerPosition);
-    this->cast(level);
-    if (!this->getHitDirection())
+    while (windowColumn < windowDimensions.x)
     {
-        if (this->getRayPosition().getDirectionX() == 0)
-            wallDistance = this->getPreviousWallDistance();
-        else
-            wallDistance = ((this->getRayPosition().getPositionX() - playerPosition.getPositionX() +
-                             ((POSITION_UNIT_X - this->getSteps().x) / 2)) * POSITION_UNIT_X) /
-                           this->getRayPosition().getDirectionX();
+        this->initialize(windowColumn, playerPosition);
+        currentRay = Ray(playerPosition, this->getRayPosition(), level, windowDimensions.y);
+        currentRay.initializeTexture(textures.at(currentRay.getHitBlockType()));
+        currentRay.fillScreen(this->getWindow(), windowColumn, windowDimensions, displayType);
+        windowColumn += 1;
     }
-    else
-    {
-        if (this->getRayPosition().getDirectionY() == 0)
-            wallDistance = this->getPreviousWallDistance();
-        else
-            wallDistance = ((this->getRayPosition().getPositionY() - playerPosition.getPositionY() +
-                             ((POSITION_UNIT_Y - this->getSteps().y) / 2)) * POSITION_UNIT_Y) /
-                           this->getRayPosition().getDirectionY();
-    }
-    this->setPreviousWallDistance(wallDistance);
-    return wallDistance;
 }
 
 /**
@@ -76,84 +63,19 @@ int RayCaster::render(Position const &playerPosition, Level *level)
  * @param playerPosition
  * @return
  */
-void RayCaster::initializeVectors(Position const &playerPosition)
+void RayCaster::initialize(int windowColumn, Position const &playerPosition)
 {
-    if (this->getRayPosition().getDirectionX() == 0)
-        this->_deltaDistance.x = 0;
-    else
-        this->_deltaDistance.x = std::abs((POSITION_UNIT_X * POSITION_UNIT_X) / this->getRayPosition().getDirectionX());
-    if (this->getRayPosition().getDirectionY() == 0)
-        this->_deltaDistance.y = 0;
-    else
-        this->_deltaDistance.y = std::abs((POSITION_UNIT_Y * POSITION_UNIT_Y) / this->getRayPosition().getDirectionY());
-}
+    Position rayPosition = this->getRayPosition();
+    int cameraPosition = 0;
 
-/**
- * Computes the raycasting distances.
- * @param playerPosition
- */
-void RayCaster::computeDistances(Position const &playerPosition)
-{
-    if (this->getRayPosition().getDirectionX() < 0)
-    {
-        this->_steps.x = -POSITION_UNIT_X;
-        this->_sideDistance.x =
-                ((playerPosition.getPositionX() - this->getRayPosition().getPositionX()) * this->_deltaDistance.x) /
-                POSITION_UNIT_X;
-    }
-    else
-    {
-        this->_steps.x = POSITION_UNIT_X;
-        this->_sideDistance.x =
-                ((this->getRayPosition().getPositionX() + POSITION_UNIT_X - playerPosition.getPositionX()) *
-                 this->_deltaDistance.x) / POSITION_UNIT_X;
-    }
-    if (this->getRayPosition().getDirectionY() < 0)
-    {
-        this->_steps.y = -POSITION_UNIT_Y;
-        this->_sideDistance.y =
-                ((playerPosition.getPositionY() - this->getRayPosition().getPositionY()) * this->_deltaDistance.y) /
-                POSITION_UNIT_Y;
-    }
-    else
-    {
-        this->_steps.y = POSITION_UNIT_Y;
-        this->_sideDistance.y =
-                ((this->getRayPosition().getPositionY() + POSITION_UNIT_Y - playerPosition.getPositionY()) *
-                 this->_deltaDistance.y) / POSITION_UNIT_Y;
-    }
-}
-
-/**
- * Casts a ray until it hits a wall.
- * @param levelMap
- */
-void RayCaster::cast(Level *level)
-{
-    bool wallEncountered = false;
-    long positionX = 0;
-    long positionY = 0;
-
-    while (!wallEncountered)
-    {
-        if (this->_sideDistance.x < this->_sideDistance.y)
-        {
-            this->_sideDistance.x += this->_deltaDistance.x;
-            this->_rayPosition.setPositionX(this->getRayPosition().getPositionX() + this->getSteps().x);
-            this->setHitDirection(0);
-        }
-        else
-        {
-            this->_sideDistance.y += this->_deltaDistance.y;
-            this->_rayPosition.setPositionY(this->getRayPosition().getPositionY() + this->getSteps().y);
-            this->setHitDirection(1);
-        }
-        positionX = this->getRayPosition().getPositionX() / POSITION_UNIT_X;
-        positionY = this->getRayPosition().getPositionY() / POSITION_UNIT_Y;
-        if (positionX >= level->getLevelWidth() || positionX < 0 || positionY >= level->getLevelHeight() ||
-            positionY < 0 || level->getLevelMap()[positionY][positionX] == Level::BLOCK_STANDARD_WALL)
-            wallEncountered = true;
-    }
+    cameraPosition = (((2 * windowColumn) * POSITION_UNIT_X) / this->getWindowSize().x) - POSITION_UNIT_X;
+    rayPosition.setPositionX((playerPosition.getPositionX() / POSITION_UNIT_X) * POSITION_UNIT_X);
+    rayPosition.setPositionY((playerPosition.getPositionY() / POSITION_UNIT_Y) * POSITION_UNIT_Y);
+    rayPosition.setDirectionX(
+            playerPosition.getDirectionX() + ((playerPosition.getPlaneX() * cameraPosition) / POSITION_UNIT_X));
+    rayPosition.setDirectionY(
+            playerPosition.getDirectionY() + ((playerPosition.getPlaneY() * cameraPosition) / POSITION_UNIT_Y));
+    this->setRayPosition(rayPosition);
 }
 
 /**
@@ -175,90 +97,37 @@ void RayCaster::setRayPosition(Position const &rayPosition)
 }
 
 /**
- * The getter for the delta distance.
+ * The getter for the window.
  * @return
  */
-sf::Vector2i const &RayCaster::getDeltaDistance() const
+sf::RenderWindow *RayCaster::getWindow() const
 {
-    return this->_deltaDistance;
+    return this->_window;
 }
 
 /**
- * The setter for the delta distance.
- * @param deltaDistance
+ * The setter for the window.
+ * @param window
  */
-void RayCaster::setDeltaDistance(sf::Vector2i const &deltaDistance)
+void RayCaster::setWindow(sf::RenderWindow *window)
 {
-    this->_deltaDistance = deltaDistance;
+    this->_window = window;
 }
 
 /**
- * The getter for the side distance.
+ * The getter for the window size.
  * @return
  */
-sf::Vector2i const &RayCaster::getSideDistance() const
+sf::Vector2u const &RayCaster::getWindowSize() const
 {
-    return this->_sideDistance;
+    return this->_windowSize;
 }
 
 /**
- * The setter for the side distance.
- * @param sideDistance
+ * The setter for the window size.
+ * @param windowSize
  */
-void RayCaster::setSideDistance(sf::Vector2i const &sideDistance)
+void RayCaster::setWindowSize(sf::Vector2u const &windowSize)
 {
-    this->_sideDistance = sideDistance;
-}
-
-/**
- * The getter for the steps.
- * @return
- */
-sf::Vector2i const &RayCaster::getSteps() const
-{
-    return this->_steps;
-}
-
-/**
- * The setter for the steps.
- * @param steps
- */
-void RayCaster::setSteps(sf::Vector2i const &steps)
-{
-    this->_steps = steps;
-}
-
-/**
- * The getter for the hit direction.
- * @return
- */
-int RayCaster::getHitDirection() const
-{
-    return this->_hitDirection;
-}
-
-/**
- * The setter for the hit direction.
- * @param hitDirection
- */
-void RayCaster::setHitDirection(int hitDirection)
-{
-    this->_hitDirection = hitDirection;
-}
-
-/**
- * The getter for the previous wall height.
- * @return
- */
-int RayCaster::getPreviousWallDistance() const
-{
-    return this->_previousWallDistance;
-}
-
-/**
- * The setter for the previous wall height.
- */
-void RayCaster::setPreviousWallDistance(int wallDistance)
-{
-    this->_previousWallDistance = wallDistance;
+    this->_windowSize = windowSize;
 }

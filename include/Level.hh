@@ -9,7 +9,7 @@
 #include <SFML/System.hpp>
 
 #define LEVEL_DEFAULT_NAME "Default Level"
-#define LEVEL_DEFAULT_FILE "../levels/test.lvl"
+#define LEVEL_DEFAULT_FILE "../resources/levels/default.lvl"
 
 class Level
 {
@@ -18,6 +18,8 @@ public:
     {
         BLOCK_EMPTY = '0',
         BLOCK_STANDARD_WALL = '1',
+        BLOCK_EAGLE_WALL = '2',
+        BLOCK_WOODEN_WALL = '3',
         BLOCK_START_UP = 'A',
         BLOCK_START_RIGHT = '>',
         BLOCK_START_DOWN = 'V',
@@ -33,6 +35,8 @@ public:
     Level &operator=(Level const &);
 
     friend std::ostream &operator<<(std::ostream &, Level const &);
+
+    static bool isLevelWall(int);
 
     Position loadLevelMap();
 

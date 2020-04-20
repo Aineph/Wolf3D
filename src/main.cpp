@@ -21,13 +21,22 @@
  */
 int main()
 {
-    Game *game = new Game();
+    bool isRunning = true;
 
-    if (!game->start())
-        return 1;
-    while (game->run())
+    try
     {
-        /*std::cout << *game << std::endl;*/
+        Game *game = new Game();
+
+        if (!game->start())
+            return 1;
+        while (isRunning)
+        {
+            isRunning = game->run();
+        }
+    } catch (std::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
+        return 1;
     }
     return 0;
 }
