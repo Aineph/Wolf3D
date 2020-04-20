@@ -11,6 +11,7 @@ A remake of the game Wolfenstein 3D using the ray-casting technique.
 
 This project uses the SFML Library.
 Before you install this repository, please make sure the library is installed on your file system.
+If you don't have it yet, you can get it by following this link: https://www.sfml-dev.org/download-fr.php.
 
 You will need CMake in order to compile. The minimum version required is 3.14.
 You can download it there: https://cmake.org/download/.
