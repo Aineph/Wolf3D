@@ -38,8 +38,10 @@ $> ./Wolf3D
 
 # User Manual
 
-This section is not yet completed. It will be available in a future release.
+Use the direction keys or **Z**, **Q**, **S**, **D** to move inside the map.
+Additionally, you can use press **T** to change the rendering mode, textured or raw.
 
 # Specifications
 
-This section is not yet completed. It will be available in a future release.
+The Wolf3D project uses the ray-casting algorithm to render a 2D map to a semi-3D environment.
+This section will be completed in a future release.
