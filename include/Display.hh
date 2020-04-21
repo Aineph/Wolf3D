@@ -7,8 +7,8 @@
 #define WOLF3D_DISPLAY_HH
 
 #define DISPLAY_DEFAULT_TITLE "Wolf3D"
-#define DISPLAY_DEFAULT_WIDTH 800
-#define DISPLAY_DEFAULT_HEIGHT 600
+#define DISPLAY_DEFAULT_WIDTH 1920
+#define DISPLAY_DEFAULT_HEIGHT 1080
 
 #define DISPLAY_DEFAULT_MAP_RATIO 4
 #define DISPLAY_DEFAULT_PLAYER_SIZE 10
@@ -67,6 +67,8 @@ public:
     void setEventTimer(sf::Clock const &);
 
 private:
+    Display();
+
     static Display *_instance;
     sf::RenderWindow *_window;
     std::string _windowTitle;
@@ -74,8 +76,6 @@ private:
     std::map<sf::Keyboard::Key, bool> _events;
     std::map<Level::BlockType, sf::Texture *> _textures;
     sf::Clock _eventTimer;
-
-    Display();
 };
 
 

@@ -29,7 +29,7 @@ Display::Display()
     this->setWindowTitle(DISPLAY_DEFAULT_TITLE);
     this->setWindow(
             new sf::RenderWindow(sf::VideoMode(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT), this->getWindowTitle()));
-    this->getWindow()->setFramerateLimit(144);
+    this->getWindow()->setFramerateLimit(60);
     this->getWindow()->setVerticalSyncEnabled(true);
     this->setDisplayType(DisplayType::DISPLAY_TEXTURED);
     this->setEvents(std::map<sf::Keyboard::Key, bool>());
@@ -94,12 +94,12 @@ bool Display::loadTextures()
  * Renders the level content on the screen.
  * @param player
  * @param level
- * @return
  */
 bool Display::render(Player *player, Level *level)
 {
-    RayCaster rayCaster(this->getWindow());
+    RayCaster rayCaster = RayCaster(this->getWindow());
 
+    rayCaster = RayCaster(this->getWindow());
     this->getWindow()->clear(sf::Color::Black);
     rayCaster.compute(player->getPosition(), level, this->getTextures(), this->getDisplayType());
     this->renderMap(player, level);
@@ -191,7 +191,7 @@ bool Display::handleEvents(Player *player, Level *level)
         else if (event.type == sf::Event::Closed)
             this->getWindow()->close();
     }
-    if (currentTimer.getElapsedTime().asMicroseconds() >= 0)
+    if (currentTimer.getElapsedTime().asMicroseconds() >= 10000)
     {
         if (this->_events[sf::Keyboard::Z] || this->_events[sf::Keyboard::Up])
             player->moveForward(level);

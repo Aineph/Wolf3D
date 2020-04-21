@@ -123,7 +123,7 @@ void Ray::initializeTexture(sf::Texture *wallTexture)
 }
 
 /**
- * Fills the screen content with the current ray.
+ * Fills the render window with the current ray.
  * @param screenContent
  * @param windowColumn
  * @param windowDimensions
@@ -131,14 +131,9 @@ void Ray::initializeTexture(sf::Texture *wallTexture)
 void Ray::fillScreen(sf::RenderWindow *window, int windowColumn, sf::Vector2u const &windowDimensions,
                      Display::DisplayType displayType)
 {
-    sf::RectangleShape sky(sf::Vector2f(1, this->getWallStart()));
     sf::RectangleShape wall(sf::Vector2f(1, this->getWallSize()));
-    sf::RectangleShape floor(sf::Vector2f(1, this->getWallStart()));
 
-    sky.setPosition(windowColumn, 0);
     wall.setPosition(windowColumn, this->getWallStart());
-    floor.setPosition(windowColumn, this->getWallEnd());
-    sky.setFillColor(sf::Color::Blue);
     if (displayType == Display::DisplayType::DISPLAY_VANILLA)
         wall.setFillColor(this->getWallColor());
     else
@@ -146,10 +141,7 @@ void Ray::fillScreen(sf::RenderWindow *window, int windowColumn, sf::Vector2u co
         wall.setTexture(this->getWallTexture());
         wall.setTextureRect(sf::IntRect(this->getWallTexturePosition(), 0, 1, this->getWallTextureDimensions().y));
     }
-    floor.setFillColor(sf::Color::Green);
-    window->draw(sky);
     window->draw(wall);
-    window->draw(floor);
 }
 
 /**

@@ -6,11 +6,14 @@
 #ifndef WOLF3D_GAME_HH
 #define WOLF3D_GAME_HH
 
+#define MICROSECONDS_PER_SECOND 1000000
 
 class Game
 {
 public:
     Game();
+
+    Game(Game const &);
 
     virtual ~Game();
 
@@ -22,6 +25,10 @@ public:
 
     bool run();
 
+    Display *getDisplay() const;
+
+    void setDisplay(Display *display);
+
     Player *getCurrentPlayer() const;
 
     void setCurrentPlayer(Player *);
@@ -30,14 +37,15 @@ public:
 
     void setCurrentLevel(Level *);
 
-    Display *getDisplay() const;
+    sf::Clock const &getGameClock() const;
 
-    void setDisplay(Display *display);
+    void setGameClock(sf::Clock const &);
 
 private:
     Display *_display;
     Player *_currentPlayer;
     Level *_currentLevel;
+    sf::Clock _gameClock;
 };
 
 

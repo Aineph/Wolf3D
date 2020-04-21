@@ -18,6 +18,16 @@
 /**
  * The raycaster constructor.
  */
+RayCaster::RayCaster()
+{
+    this->setRayPosition(Position());
+    this->setWindow(nullptr);
+    this->setWindowSize(sf::Vector2u());
+}
+
+/**
+ * The raycaster constructor.
+ */
 RayCaster::RayCaster(sf::RenderWindow *window)
 {
     this->setRayPosition(Position());
@@ -37,6 +47,21 @@ RayCaster::RayCaster(RayCaster const &other)
 }
 
 /**
+ * The raycaster equal operator.
+ * @param other
+ */
+RayCaster &RayCaster::operator=(RayCaster const &other)
+{
+    if (this != &other)
+    {
+        this->setRayPosition(other.getRayPosition());
+        this->setWindow(other.getWindow());
+        this->setWindowSize(other.getWindowSize());
+    }
+    return *this;
+}
+
+/**
  * Computes the view from the player's point of view.
  * @param playerPosition
  * @param levelMap
@@ -45,9 +70,23 @@ void RayCaster::compute(Position const &playerPosition, Level *level,
                         std::map<Level::BlockType, sf::Texture *> const &textures, Display::DisplayType displayType)
 {
     sf::Vector2u const &windowDimensions = this->getWindowSize();
+    sf::RectangleShape floor;
+    sf::Texture *floorTexture;
+    int windowRow = 0;
     int windowColumn = 0;
     Ray currentRay;
 
+    floorTexture = textures.at(Level::BlockType::BLOCK_WOODEN_WALL);
+    while (windowRow < windowDimensions.y)
+    {
+//        floor = sf::RectangleShape(sf::Vector2f(windowDimensions.x, 1));
+        //       floor.setPosition(0, windowRow);
+        //      floor.setFillColor(sf::Color::Yellow);
+        //    floor.setTexture(floorTexture);
+        //  floor.setTextureRect(sf::IntRect(0, windowRow % 64, 1, 64));
+        // this->getWindow()->draw(floor);
+        windowRow += 1;
+    }
     while (windowColumn < windowDimensions.x)
     {
         this->initialize(windowColumn, playerPosition);

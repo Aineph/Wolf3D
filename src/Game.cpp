@@ -19,11 +19,18 @@
 /**
  * The game constructor.
  */
-Game::Game() : _currentPlayer(), _currentLevel()
+Game::Game()
 {
+    this->setDisplay(Display::getInstance());
     this->setCurrentPlayer(new Player());
     this->setCurrentLevel(new Level());
-    this->setDisplay(Display::getInstance());
+}
+
+Game::Game(Game const &other)
+{
+    this->setDisplay(other.getDisplay());
+    this->setCurrentPlayer(other.getCurrentPlayer());
+    this->setCurrentLevel(other.getCurrentLevel());
 }
 
 /**
@@ -43,9 +50,11 @@ Game &Game::operator=(Game const &other)
 {
     if (this != &other)
     {
-        this->setCurrentPlayer(other.getCurrentPlayer());
-        this->setCurrentLevel(other.getCurrentLevel());
         this->setDisplay(other.getDisplay());
+        delete this->getCurrentPlayer();
+        this->setCurrentPlayer(other.getCurrentPlayer());
+        delete this->getCurrentLevel();
+        this->setCurrentLevel(other.getCurrentLevel());
     }
     return *this;
 }
@@ -84,9 +93,32 @@ bool Game::start()
  */
 bool Game::run()
 {
+    sf::Clock gameClock = this->getGameClock();
+
     this->getDisplay()->handleEvents(this->getCurrentPlayer(), this->getCurrentLevel());
     this->getDisplay()->render(this->getCurrentPlayer(), this->getCurrentLevel());
+    std::cout << MICROSECONDS_PER_SECOND / gameClock.getElapsedTime().asMicroseconds() << " FPS" << std::endl;
+    gameClock.restart();
+    this->setGameClock(gameClock);
     return this->getDisplay()->isRunning();
+}
+
+/**
+ * The getter for the display.
+ * @return
+ */
+Display *Game::getDisplay() const
+{
+    return this->_display;
+}
+
+/**
+ * The setter for the display.
+ * @param display
+ */
+void Game::setDisplay(Display *display)
+{
+    this->_display = display;
 }
 
 /**
@@ -126,19 +158,19 @@ void Game::setCurrentLevel(Level *currentLevel)
 }
 
 /**
- * The getter for the display.
+ * The getter for the game clock.
  * @return
  */
-Display *Game::getDisplay() const
+sf::Clock const &Game::getGameClock() const
 {
-    return this->_display;
+    return this->_gameClock;
 }
 
 /**
- * The setter for the display.
- * @param display
+ * The setter for the game clock.
+ * @param gameClock
  */
-void Game::setDisplay(Display *display)
+void Game::setGameClock(sf::Clock const &gameClock)
 {
-    this->_display = display;
+    this->_gameClock = gameClock;
 }

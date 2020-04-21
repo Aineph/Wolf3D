@@ -9,11 +9,15 @@
 class RayCaster
 {
 public:
+    RayCaster();
+
     RayCaster(sf::RenderWindow *);
 
     RayCaster(RayCaster const &);
 
     virtual ~RayCaster() = default;
+
+    RayCaster &operator=(RayCaster const &);
 
     void compute(Position const &, Level *, std::map<Level::BlockType, sf::Texture *> const &, Display::DisplayType);
 
