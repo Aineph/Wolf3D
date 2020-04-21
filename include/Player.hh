@@ -27,6 +27,8 @@ public:
 
     bool rotateRight();
 
+    void fixAngles(Position &);
+
     Position const &getPosition() const;
 
     void setPosition(Position const &);
