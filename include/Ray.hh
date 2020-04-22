@@ -44,6 +44,10 @@ public:
 
     void setIncrementalPosition(Position const &);
 
+    sf::Vector2i const &getIncrementalSteps() const;
+
+    void setIncrementalSteps(sf::Vector2i const &);
+
     RayHitAxis getHitAxis() const;
 
     void setHitAxis(RayHitAxis);
@@ -91,6 +95,7 @@ public:
 private:
     Position _rayPosition;
     Position _incrementalPosition;
+    sf::Vector2i _incrementalSteps;
     RayHitAxis _hitAxis;
     Level::BlockType _hitBlockType;
     int _hitPosition;

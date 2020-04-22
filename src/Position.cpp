@@ -148,7 +148,7 @@ void Position::setDirectionY(long directionY)
  * The getter for the plane x.
  * @return
  */
-long Position::getPlaneX() const
+double Position::getPlaneX() const
 {
     return this->_planeX;
 }
@@ -157,7 +157,7 @@ long Position::getPlaneX() const
  * The setter for the plane x.
  * @return
  */
-void Position::setPlaneX(long planeX)
+void Position::setPlaneX(double planeX)
 {
     this->_planeX = planeX;
 }
@@ -166,7 +166,7 @@ void Position::setPlaneX(long planeX)
  * The getter for the plane y.
  * @return
  */
-long Position::getPlaneY() const
+double Position::getPlaneY() const
 {
     return this->_planeY;
 }
@@ -175,7 +175,7 @@ long Position::getPlaneY() const
  * The setter for the plane y.
  * @return
  */
-void Position::setPlaneY(long planeY)
+void Position::setPlaneY(double planeY)
 {
     this->_planeY = planeY;
 }

@@ -71,8 +71,10 @@ bool Player::moveForward(Level *level)
 
     currentPositionX = currentPosition.getPositionX() / POSITION_UNIT_X;
     currentPositionY = currentPosition.getPositionY() / POSITION_UNIT_Y;
-    newPositionX = currentPosition.getPositionX() + (currentPosition.getDirectionX() / 20);
-    newPositionY = currentPosition.getPositionY() + (currentPosition.getDirectionY() / 20);
+    newPositionX = static_cast<long>(currentPosition.getPositionX() +
+                                     (currentPosition.getDirectionX() * PLAYER_DEFAULT_SPEED));
+    newPositionY = static_cast<long>(currentPosition.getPositionY() +
+                                     (currentPosition.getDirectionY() * PLAYER_DEFAULT_SPEED));
     positionX = newPositionX / POSITION_UNIT_X;
     positionY = newPositionY / POSITION_UNIT_Y;
     if (positionX < level->getLevelWidth() && positionX >= 0 && positionY < level->getLevelHeight() && positionY >= 0 &&
@@ -109,8 +111,10 @@ bool Player::moveBackward(Level *level)
 
     currentPositionX = currentPosition.getPositionX() / POSITION_UNIT_X;
     currentPositionY = currentPosition.getPositionY() / POSITION_UNIT_Y;
-    newPositionX = currentPosition.getPositionX() - (currentPosition.getDirectionX() / 20);
-    newPositionY = currentPosition.getPositionY() - (currentPosition.getDirectionY() / 20);
+    newPositionX = static_cast<long>(currentPosition.getPositionX() -
+                                     (currentPosition.getDirectionX() * PLAYER_DEFAULT_SPEED));
+    newPositionY = static_cast<long>(currentPosition.getPositionY() -
+                                     (currentPosition.getDirectionY() * PLAYER_DEFAULT_SPEED));
     positionX = newPositionX / POSITION_UNIT_X;
     positionY = newPositionY / POSITION_UNIT_Y;
     if (positionX < level->getLevelWidth() && positionX >= 0 && positionY < level->getLevelHeight() && positionY >= 0 &&
@@ -136,23 +140,23 @@ bool Player::moveBackward(Level *level)
  */
 bool Player::rotateLeft()
 {
-    long rotationCos = static_cast<long>(std::cos(-(M_PI / 48)) * POSITION_UNIT_X * POSITION_UNIT_Y);
-    long rotationSin = static_cast<long>(std::sin(-(M_PI / 48)) * POSITION_UNIT_X * POSITION_UNIT_Y);
+    double rotationCos = std::cos(-PLAYER_DEFAULT_ROTATION);
+    double rotationSin = std::sin(-PLAYER_DEFAULT_ROTATION);
     Position currentPosition = this->getPosition();
+    double directionAngle = 0;
 
-    currentPosition.setDirectionX(
-            ((currentPosition.getDirectionX() * rotationCos) - (currentPosition.getDirectionY() * rotationSin)) /
-            (POSITION_UNIT_X * POSITION_UNIT_Y));
-    currentPosition.setDirectionY(
-            ((this->getPosition().getDirectionX() * rotationSin) + (currentPosition.getDirectionY() * rotationCos)) /
-            (POSITION_UNIT_X * POSITION_UNIT_Y));
+    currentPosition.setDirectionX(static_cast<long>((currentPosition.getDirectionX() * rotationCos) -
+                                                    (currentPosition.getDirectionY() * rotationSin)));
+    currentPosition.setDirectionY(static_cast<long>((this->getPosition().getDirectionX() * rotationSin) +
+                                                    (currentPosition.getDirectionY() * rotationCos)));
     currentPosition.setPlaneX(
-            ((currentPosition.getPlaneX() * rotationCos) - (currentPosition.getPlaneY() * rotationSin)) /
-            (POSITION_UNIT_X * POSITION_UNIT_Y));
+            (currentPosition.getPlaneX() * rotationCos) - (currentPosition.getPlaneY() * rotationSin));
     currentPosition.setPlaneY(
-            ((this->getPosition().getPlaneX() * rotationSin) + (currentPosition.getPlaneY() * rotationCos)) /
-            (POSITION_UNIT_X * POSITION_UNIT_Y));
-    Player::fixAngles(currentPosition);
+            (this->getPosition().getPlaneX() * rotationSin) + (currentPosition.getPlaneY() * rotationCos));
+    directionAngle = std::round(
+            (std::atan2(currentPosition.getDirectionY(), currentPosition.getDirectionX()) * 180) / M_PI);
+    currentPosition.setDirectionX(static_cast<long>(cos((directionAngle * M_PI) / 180) * POSITION_UNIT_X));
+    currentPosition.setDirectionY(static_cast<long>(sin((directionAngle * M_PI) / 180) * POSITION_UNIT_X));
     this->setPosition(currentPosition);
     return true;
 }
@@ -163,57 +167,25 @@ bool Player::rotateLeft()
  */
 bool Player::rotateRight()
 {
-    long rotationCos = static_cast<long>(std::cos(M_PI / 48) * POSITION_UNIT_X * POSITION_UNIT_Y);
-    long rotationSin = static_cast<long>(std::sin(M_PI / 48) * POSITION_UNIT_X * POSITION_UNIT_Y);
     Position currentPosition = this->getPosition();
+    double rotationCos = std::cos(PLAYER_DEFAULT_ROTATION);
+    double rotationSin = std::sin(PLAYER_DEFAULT_ROTATION);
+    double directionAngle = 0;
 
-    currentPosition.setDirectionX(
-            ((currentPosition.getDirectionX() * rotationCos) - (currentPosition.getDirectionY() * rotationSin)) /
-            (POSITION_UNIT_X * POSITION_UNIT_Y));
-    currentPosition.setDirectionY(
-            ((this->getPosition().getDirectionX() * rotationSin) + (currentPosition.getDirectionY() * rotationCos)) /
-            (POSITION_UNIT_X * POSITION_UNIT_Y));
+    currentPosition.setDirectionX(static_cast<long>((currentPosition.getDirectionX() * rotationCos) -
+                                                    (currentPosition.getDirectionY() * rotationSin)));
+    currentPosition.setDirectionY(static_cast<long>((this->getPosition().getDirectionX() * rotationSin) +
+                                                    (currentPosition.getDirectionY() * rotationCos)));
     currentPosition.setPlaneX(
-            ((currentPosition.getPlaneX() * rotationCos) - (currentPosition.getPlaneY() * rotationSin)) /
-            (POSITION_UNIT_X * POSITION_UNIT_Y));
+            (currentPosition.getPlaneX() * rotationCos) - (currentPosition.getPlaneY() * rotationSin));
     currentPosition.setPlaneY(
-            ((this->getPosition().getPlaneX() * rotationSin) + (currentPosition.getPlaneY() * rotationCos)) /
-            (POSITION_UNIT_X * POSITION_UNIT_Y));
-    Player::fixAngles(currentPosition);
+            (this->getPosition().getPlaneX() * rotationSin) + (currentPosition.getPlaneY() * rotationCos));
+    directionAngle = std::round(
+            (std::atan2(currentPosition.getDirectionY(), currentPosition.getDirectionX()) * 180) / M_PI);
+    currentPosition.setDirectionX(static_cast<long>(cos((directionAngle * M_PI) / 180) * POSITION_UNIT_X));
+    currentPosition.setDirectionY(static_cast<long>(sin((directionAngle * M_PI) / 180) * POSITION_UNIT_X));
     this->setPosition(currentPosition);
     return true;
-}
-
-void Player::fixAngles(Position &playerPosition)
-{
-    if (playerPosition.getDirectionX() == 0)
-    {
-        if (playerPosition.getDirectionY() < 0)
-        {
-            playerPosition.setDirectionY(-POSITION_UNIT_Y);
-            playerPosition.setPlaneX(POSITION_DEFAULT_PLANE_X);
-        }
-        else if (playerPosition.getDirectionY() > 0)
-        {
-            playerPosition.setDirectionY(POSITION_UNIT_Y);
-            playerPosition.setPlaneX(-POSITION_DEFAULT_PLANE_X);
-        }
-        playerPosition.setPlaneY(0);
-    }
-    if (playerPosition.getDirectionY() == 0)
-    {
-        if (playerPosition.getDirectionX() < 0)
-        {
-            playerPosition.setDirectionX(-POSITION_UNIT_X);
-            playerPosition.setPlaneY(-POSITION_DEFAULT_PLANE_Y);
-        }
-        else if (playerPosition.getDirectionY() > 0)
-        {
-            playerPosition.setDirectionX(POSITION_UNIT_X);
-            playerPosition.setPlaneY(POSITION_DEFAULT_PLANE_Y);
-        }
-        playerPosition.setPlaneX(0);
-    }
 }
 
 /**

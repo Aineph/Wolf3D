@@ -111,9 +111,9 @@ void RayCaster::initialize(int windowColumn, Position const &playerPosition)
     rayPosition.setPositionX((playerPosition.getPositionX() / POSITION_UNIT_X) * POSITION_UNIT_X);
     rayPosition.setPositionY((playerPosition.getPositionY() / POSITION_UNIT_Y) * POSITION_UNIT_Y);
     rayPosition.setDirectionX(
-            playerPosition.getDirectionX() + ((playerPosition.getPlaneX() * cameraPosition) / POSITION_UNIT_X));
+            static_cast<long>(playerPosition.getDirectionX() + (playerPosition.getPlaneX() * cameraPosition)));
     rayPosition.setDirectionY(
-            playerPosition.getDirectionY() + ((playerPosition.getPlaneY() * cameraPosition) / POSITION_UNIT_Y));
+            static_cast<long>(playerPosition.getDirectionY() + (playerPosition.getPlaneY() * cameraPosition)));
     this->setRayPosition(rayPosition);
 }
 

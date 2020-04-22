@@ -19,6 +19,7 @@ Ray::Ray()
 {
     this->setRayPosition(Position());
     this->setIncrementalPosition(Position());
+    this->setIncrementalSteps(sf::Vector2i());
     this->setHitAxis(Ray::RayHitAxis::AXIS_X);
     this->setHitBlockType(Level::BlockType::BLOCK_STANDARD_WALL);
     this->setHitPosition(0);
@@ -43,6 +44,7 @@ Ray::Ray(Position const &playerPosition, Position const &rayPosition, Level *lev
 {
     this->setRayPosition(rayPosition);
     this->setIncrementalPosition(Position());
+    this->setIncrementalSteps(sf::Vector2i());
     this->setHitAxis(Ray::RayHitAxis::AXIS_X);
     this->setHitBlockType(Level::BlockType::BLOCK_STANDARD_WALL);
     this->setHitPosition(0);
@@ -68,6 +70,7 @@ Ray::Ray(Ray const &other)
 {
     this->setRayPosition(other.getRayPosition());
     this->setIncrementalPosition(other.getIncrementalPosition());
+    this->setIncrementalSteps(other.getIncrementalSteps());
     this->setHitAxis(other.getHitAxis());
     this->setHitBlockType(other.getHitBlockType());
     this->setHitPosition(other.getHitPosition());
@@ -92,6 +95,7 @@ Ray &Ray::operator=(Ray const &other)
     {
         this->setRayPosition(other.getRayPosition());
         this->setIncrementalPosition(other.getIncrementalPosition());
+        this->setIncrementalSteps(other.getIncrementalSteps());
         this->setHitAxis(other.getHitAxis());
         this->setHitBlockType(other.getHitBlockType());
         this->setHitPosition(other.getHitPosition());
@@ -151,6 +155,7 @@ void Ray::fillScreen(sf::RenderWindow *window, int windowColumn, sf::Vector2u co
 void Ray::initialize(Position const &playerPosition)
 {
     Position incrementalPosition = this->getIncrementalPosition();
+    sf::Vector2i incrementalSteps = this->getIncrementalSteps();
     Position const &rayPosition = this->getRayPosition();
 
     if (rayPosition.getDirectionX() == 0)
@@ -177,9 +182,10 @@ void Ray::initialize(Position const &playerPosition)
         incrementalPosition.setPositionY(
                 ((rayPosition.getPositionY() + POSITION_UNIT_Y - playerPosition.getPositionY()) *
                  incrementalPosition.getDirectionY()) / POSITION_UNIT_Y);
-    incrementalPosition.setPlaneX(((rayPosition.getDirectionX() < 0) ? (-POSITION_UNIT_X) : (POSITION_UNIT_X)));
-    incrementalPosition.setPlaneY(((rayPosition.getDirectionY() < 0) ? (-POSITION_UNIT_Y) : (POSITION_UNIT_Y)));
+    incrementalSteps.x = ((rayPosition.getDirectionX() < 0) ? (-POSITION_UNIT_X) : (POSITION_UNIT_X));
+    incrementalSteps.y = ((rayPosition.getDirectionY() < 0) ? (-POSITION_UNIT_Y) : (POSITION_UNIT_Y));
     this->setIncrementalPosition(incrementalPosition);
+    this->setIncrementalSteps(incrementalSteps);
 }
 
 /**
@@ -201,13 +207,13 @@ void Ray::cast(Level *level)
                                                  incrementalPosition.getPositionY()))
         {
             incrementalPosition.setPositionX(incrementalPosition.getPositionX() + incrementalPosition.getDirectionX());
-            rayPosition.setPositionX(rayPosition.getPositionX() + incrementalPosition.getPlaneX());
+            rayPosition.setPositionX(rayPosition.getPositionX() + this->getIncrementalSteps().x);
             this->setHitAxis(RayHitAxis::AXIS_Y);
         }
         else
         {
             incrementalPosition.setPositionY(incrementalPosition.getPositionY() + incrementalPosition.getDirectionY());
-            rayPosition.setPositionY(rayPosition.getPositionY() + incrementalPosition.getPlaneY());
+            rayPosition.setPositionY(rayPosition.getPositionY() + this->getIncrementalSteps().y);
             this->setHitAxis(RayHitAxis::AXIS_X);
         }
         positionX = rayPosition.getPositionX() / POSITION_UNIT_X;
@@ -239,7 +245,7 @@ void Ray::fetchDistances(Position const &playerPosition)
             this->setWallDistance(std::abs(rayPosition.getPositionX() - playerPosition.getPositionX()));
         else
             this->setWallDistance(((rayPosition.getPositionX() - playerPosition.getPositionX() +
-                                    ((POSITION_UNIT_X - incrementalPosition.getPlaneX()) / 2)) * POSITION_UNIT_X) /
+                                    ((POSITION_UNIT_X - this->getIncrementalSteps().x) / 2)) * POSITION_UNIT_X) /
                                   rayPosition.getDirectionX());
         hitPositionTemp = playerPosition.getPositionY() +
                           (this->getWallDistance() * rayPosition.getDirectionY()) / POSITION_UNIT_X;
@@ -251,7 +257,7 @@ void Ray::fetchDistances(Position const &playerPosition)
             this->setWallDistance(std::abs(rayPosition.getPositionY() - playerPosition.getPositionY()));
         else
             this->setWallDistance(((rayPosition.getPositionY() - playerPosition.getPositionY() +
-                                    ((POSITION_UNIT_Y - incrementalPosition.getPlaneY()) / 2)) * POSITION_UNIT_Y) /
+                                    ((POSITION_UNIT_Y - this->getIncrementalSteps().y) / 2)) * POSITION_UNIT_Y) /
                                   rayPosition.getDirectionY());
         hitPositionTemp = playerPosition.getPositionX() +
                           (this->getWallDistance() * rayPosition.getDirectionX()) / POSITION_UNIT_Y;
@@ -315,6 +321,24 @@ Position const &Ray::getIncrementalPosition() const
 void Ray::setIncrementalPosition(Position const &incrementalPosition)
 {
     this->_incrementalPosition = incrementalPosition;
+}
+
+/**
+ * The getter for the incremental steps.
+ * @return
+ */
+sf::Vector2i const &Ray::getIncrementalSteps() const
+{
+    return this->_incrementalSteps;
+}
+
+/**
+ * The setter for the incremental steps.
+ * @param incrementalSteps
+ */
+void Ray::setIncrementalSteps(sf::Vector2i const &incrementalSteps)
+{
+    this->_incrementalSteps = incrementalSteps;
 }
 
 /**

@@ -13,8 +13,8 @@
 #define POSITION_DEFAULT_Y (0 + (POSITION_UNIT_Y / 2))
 #define POSITION_DEFAULT_DIRECTION_X 0
 #define POSITION_DEFAULT_DIRECTION_Y 0
-#define POSITION_DEFAULT_PLANE_X ((66 * POSITION_UNIT_X) / 100)
-#define POSITION_DEFAULT_PLANE_Y ((66 * POSITION_UNIT_Y) / 100)
+#define POSITION_DEFAULT_PLANE_X .66
+#define POSITION_DEFAULT_PLANE_Y .66
 
 class Position
 {
@@ -43,21 +43,21 @@ public:
 
     void setDirectionY(long);
 
-    long getPlaneX() const;
+    double getPlaneX() const;
 
-    void setPlaneX(long);
+    void setPlaneX(double);
 
-    long getPlaneY() const;
+    double getPlaneY() const;
 
-    void setPlaneY(long);
+    void setPlaneY(double);
 
 private:
     long _positionX;
     long _positionY;
     long _directionX;
     long _directionY;
-    long _planeX;
-    long _planeY;
+    double _planeX;
+    double _planeY;
 };
 
 

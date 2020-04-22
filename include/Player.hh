@@ -6,6 +6,9 @@
 #ifndef WOLF3D_PLAYER_HH
 #define WOLF3D_PLAYER_HH
 
+#define PLAYER_DEFAULT_SPEED .05
+#define PLAYER_DEFAULT_ROTATION M_PI / 60
+
 class Player
 {
 public:
@@ -26,8 +29,6 @@ public:
     bool rotateLeft();
 
     bool rotateRight();
-
-    void fixAngles(Position &);
 
     Position const &getPosition() const;
 
