@@ -6,8 +6,6 @@
 #ifndef WOLF3D_LEVEL_HH
 #define WOLF3D_LEVEL_HH
 
-#include <SFML/System.hpp>
-
 #define LEVEL_DEFAULT_NAME "Default Level"
 #define LEVEL_DEFAULT_FILE "../resources/levels/default.lvl"
 
@@ -20,6 +18,7 @@ public:
         BLOCK_STANDARD_WALL = '1',
         BLOCK_EAGLE_WALL = '2',
         BLOCK_WOODEN_WALL = '3',
+        BLOCK_BLUE_WALL = '4',
         BLOCK_START_UP = 'A',
         BLOCK_START_RIGHT = '>',
         BLOCK_START_DOWN = 'V',

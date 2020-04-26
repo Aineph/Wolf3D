@@ -39,8 +39,17 @@ $> ./Wolf3D
 
 # User Manual
 
-Use the direction keys or **Z**, **Q**, **S**, **D** to move inside the map.
-Additionally, you can use press **T** to change the rendering mode, textured or raw.
+
+Here is the list of the engine's controls:
+
+- **Z**, **Direction up**: Move forward.
+- **S**, **Direction down**: Move backward.
+- **Q**, **Direction left**: Rotate left.
+- **D**, **Direction right**: Rotate right.
+- **A**: Move left.
+- **E**: Move right.
+- **T**: Toggles the rendering mode, either textured or vanilla.
+- **Escape**: Quits the program.
 
 # Specifications
 

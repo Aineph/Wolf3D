@@ -6,39 +6,41 @@
 #ifndef WOLF3D_RAYCASTER_HH
 #define WOLF3D_RAYCASTER_HH
 
-class RayCaster
+namespace RayCaster
 {
-public:
-    RayCaster();
+    class RayCaster
+    {
+    public:
+        RayCaster();
 
-    RayCaster(sf::RenderWindow *);
+        RayCaster(sf::RenderWindow *, Level *);
 
-    RayCaster(RayCaster const &);
+        RayCaster(RayCaster const &);
 
-    virtual ~RayCaster() = default;
+        virtual ~RayCaster() = default;
 
-    RayCaster &operator=(RayCaster const &);
+        RayCaster &operator=(RayCaster const &);
 
-    void compute(Position const &, Level *, std::map<Level::BlockType, sf::Texture *> const &, Display::DisplayType);
+        void
+        compute(Position const &, Level *, std::map<Level::BlockType, sf::Texture *> const &, Display::DisplayType);
 
-    void initialize(int, Position const &);
+        Minimap const &getMinimap() const;
 
-    Position const &getRayPosition() const;
+        void setMinimap(Minimap const &);
 
-    void setRayPosition(Position const &);
+        sf::RenderWindow *getWindow() const;
 
-    sf::RenderWindow *getWindow() const;
+        void setWindow(sf::RenderWindow *);
 
-    void setWindow(sf::RenderWindow *);
+        sf::Vector2u const &getWindowSize() const;
 
-    sf::Vector2u const &getWindowSize() const;
+        void setWindowSize(sf::Vector2u const &);
 
-    void setWindowSize(sf::Vector2u const &);
-
-private:
-    Position _rayPosition;
-    sf::RenderWindow *_window;
-    sf::Vector2u _windowSize;
-};
+    private:
+        Minimap _minimap;
+        sf::RenderWindow *_window;
+        sf::Vector2u _windowSize;
+    };
+}
 
 #endif //WOLF3D_RAYCASTER_HH

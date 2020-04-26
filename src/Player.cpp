@@ -189,6 +189,86 @@ bool Player::rotateRight()
 }
 
 /**
+ * Moves the player to the left.
+ * @param level
+ * @return
+ */
+bool Player::moveLeft(Level *level)
+{
+    Position currentPosition = this->getPosition();
+    long newPositionX = 0;
+    long newPositionY = 0;
+    long currentPositionX = 0;
+    long currentPositionY = 0;
+    long positionX = 0;
+    long positionY = 0;
+
+    currentPositionX = currentPosition.getPositionX() / POSITION_UNIT_X;
+    currentPositionY = currentPosition.getPositionY() / POSITION_UNIT_Y;
+    newPositionX = static_cast<long>(currentPosition.getPositionX() +
+                                     (currentPosition.getDirectionY() * PLAYER_DEFAULT_SPEED));
+    newPositionY = static_cast<long>(currentPosition.getPositionY() -
+                                     (currentPosition.getDirectionX() * PLAYER_DEFAULT_SPEED));
+    positionX = newPositionX / POSITION_UNIT_X;
+    positionY = newPositionY / POSITION_UNIT_Y;
+    if (positionX < level->getLevelWidth() && positionX >= 0 && positionY < level->getLevelHeight() && positionY >= 0 &&
+        !Level::isLevelWall(level->getLevelMap()[positionY][positionX]))
+    {
+        currentPosition.setPositionX(newPositionX);
+        currentPosition.setPositionY(newPositionY);
+    }
+    else if (currentPositionX < level->getLevelWidth() && currentPositionX >= 0 &&
+             positionY < level->getLevelHeight() && positionY >= 0 &&
+             !Level::isLevelWall(level->getLevelMap()[positionY][currentPositionX]))
+        currentPosition.setPositionY(newPositionY);
+    else if (positionX < level->getLevelWidth() && positionX >= 0 && currentPositionY < level->getLevelHeight() &&
+             currentPositionY >= 0 && !Level::isLevelWall(level->getLevelMap()[currentPositionY][positionX]))
+        currentPosition.setPositionX(newPositionX);
+    this->setPosition(currentPosition);
+    return true;
+}
+
+/**
+ * Moves the player to the right.
+ * @param level
+ * @return
+ */
+bool Player::moveRight(Level *level)
+{
+    Position currentPosition = this->getPosition();
+    long newPositionX = 0;
+    long newPositionY = 0;
+    long currentPositionX = 0;
+    long currentPositionY = 0;
+    long positionX = 0;
+    long positionY = 0;
+
+    currentPositionX = currentPosition.getPositionX() / POSITION_UNIT_X;
+    currentPositionY = currentPosition.getPositionY() / POSITION_UNIT_Y;
+    newPositionX = static_cast<long>(currentPosition.getPositionX() -
+                                     (currentPosition.getDirectionY() * PLAYER_DEFAULT_SPEED));
+    newPositionY = static_cast<long>(currentPosition.getPositionY() +
+                                     (currentPosition.getDirectionX() * PLAYER_DEFAULT_SPEED));
+    positionX = newPositionX / POSITION_UNIT_X;
+    positionY = newPositionY / POSITION_UNIT_Y;
+    if (positionX < level->getLevelWidth() && positionX >= 0 && positionY < level->getLevelHeight() && positionY >= 0 &&
+        !Level::isLevelWall(level->getLevelMap()[positionY][positionX]))
+    {
+        currentPosition.setPositionX(newPositionX);
+        currentPosition.setPositionY(newPositionY);
+    }
+    else if (currentPositionX < level->getLevelWidth() && currentPositionX >= 0 &&
+             positionY < level->getLevelHeight() && positionY >= 0 &&
+             !Level::isLevelWall(level->getLevelMap()[positionY][currentPositionX]))
+        currentPosition.setPositionY(newPositionY);
+    else if (positionX < level->getLevelWidth() && positionX >= 0 && currentPositionY < level->getLevelHeight() &&
+             currentPositionY >= 0 && !Level::isLevelWall(level->getLevelMap()[currentPositionY][positionX]))
+        currentPosition.setPositionX(newPositionX);
+    this->setPosition(currentPosition);
+    return true;
+}
+
+/**
  * The getter for the position.
  * @return
  */

@@ -10,8 +10,6 @@
 #include "Position.hh"
 #include "Level.hh"
 
-typedef char i;
-
 /**
  * The level constructor.
  */
@@ -87,7 +85,8 @@ std::ostream &operator<<(std::ostream &os, Level const &level)
 bool Level::isLevelWall(int block)
 {
     return static_cast<Level::BlockType>(block) == Level::BlockType::BLOCK_STANDARD_WALL ||
-           block == Level::BlockType::BLOCK_EAGLE_WALL || block == Level::BlockType::BLOCK_WOODEN_WALL;
+           block == Level::BlockType::BLOCK_EAGLE_WALL || block == Level::BlockType::BLOCK_WOODEN_WALL ||
+           block == Level::BlockType::BLOCK_BLUE_WALL;
 }
 
 /**

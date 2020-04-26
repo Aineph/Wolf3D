@@ -12,11 +12,12 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
+#include "IDrawable.hh"
 #include "Position.hh"
 #include "Level.hh"
 #include "Player.hh"
 #include "Display.hh"
-#include "Ray.hh"
+#include "Minimap.hh"
 #include "RayCaster.hh"
 
 Display *Display::_instance = nullptr;
@@ -28,7 +29,8 @@ Display::Display()
 {
     this->setWindowTitle(DISPLAY_DEFAULT_TITLE);
     this->setWindow(
-            new sf::RenderWindow(sf::VideoMode(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT), this->getWindowTitle()));
+            new sf::RenderWindow(sf::VideoMode(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT), this->getWindowTitle(),
+                                 sf::Style::None));
     this->getWindow()->setFramerateLimit(60);
     this->getWindow()->setVerticalSyncEnabled(true);
     this->setDisplayType(DisplayType::DISPLAY_TEXTURED);
@@ -86,6 +88,12 @@ bool Display::loadTextures()
         delete textures[Level::BLOCK_WOODEN_WALL];
         return false;
     }
+    textures[Level::BLOCK_BLUE_WALL] = new sf::Texture();
+    if (!textures[Level::BLOCK_BLUE_WALL]->loadFromFile(TEXTURE_BLUE_WALL))
+    {
+        delete textures[Level::BLOCK_BLUE_WALL];
+        return false;
+    }
     this->setTextures(textures);
     return true;
 }
@@ -97,66 +105,12 @@ bool Display::loadTextures()
  */
 bool Display::render(Player *player, Level *level)
 {
-    RayCaster rayCaster = RayCaster(this->getWindow());
+    RayCaster::RayCaster rayCaster = RayCaster::RayCaster(this->getWindow(), level);
 
-    rayCaster = RayCaster(this->getWindow());
     this->getWindow()->clear(sf::Color::Black);
     rayCaster.compute(player->getPosition(), level, this->getTextures(), this->getDisplayType());
-    this->renderMap(player, level);
     this->getWindow()->display();
     return true;
-}
-
-/**
- * Renders a minimap on the screen.
- * @param player
- * @param level
- */
-void Display::renderMap(Player *player, Level *level)
-{
-    sf::RectangleShape rectangleShape;
-    sf::CircleShape playerShape;
-    sf::Vector2u windowDimensions = this->getWindow()->getSize();
-    float mapSizeX = static_cast<float>(windowDimensions.x) / DISPLAY_DEFAULT_MAP_RATIO;
-    float mapSizeY = static_cast<float>(windowDimensions.y) / DISPLAY_DEFAULT_MAP_RATIO;
-    float mapPosX = windowDimensions.x - mapSizeX;
-    float mapPosY = windowDimensions.y - mapSizeY;
-
-    rectangleShape = sf::RectangleShape(sf::Vector2f(mapSizeX, mapSizeY));
-    rectangleShape.setFillColor(sf::Color::White);
-    rectangleShape.setPosition(mapPosX, mapPosY);
-    this->getWindow()->draw(rectangleShape);
-    for (auto &row : level->getLevelMap())
-    {
-        mapPosX = windowDimensions.x - mapSizeX;
-        for (auto &block : row)
-        {
-            if (Level::isLevelWall(block))
-            {
-                rectangleShape = sf::RectangleShape(
-                        sf::Vector2f(mapSizeX / level->getLevelWidth(), mapSizeY / level->getLevelHeight()));
-                rectangleShape.setFillColor(sf::Color::Black);
-                rectangleShape.setPosition(mapPosX, mapPosY);
-                this->getWindow()->draw(rectangleShape);
-            }
-            mapPosX += mapSizeX / level->getLevelWidth();
-        }
-        mapPosY += mapSizeY / level->getLevelHeight();
-    }
-    playerShape = sf::CircleShape(DISPLAY_DEFAULT_PLAYER_SIZE, DISPLAY_TRIANGLE_SHAPE);
-    playerShape.setFillColor(sf::Color::Red);
-    playerShape.setPosition((windowDimensions.x - mapSizeX) + (mapSizeX / level->getLevelWidth()) *
-                                                              static_cast<float>(player->getPosition().getPositionX()) /
-                                                              POSITION_UNIT_X, (windowDimensions.y - mapSizeY) +
-                                                                               (mapSizeY / level->getLevelHeight()) *
-                                                                               static_cast<float>(player->getPosition().getPositionY()) /
-                                                                               POSITION_UNIT_Y);
-    playerShape.setOrigin(DISPLAY_DEFAULT_PLAYER_SIZE, DISPLAY_DEFAULT_PLAYER_SIZE);
-    playerShape.setScale(1, 1.5);
-    playerShape.setRotation(std::atan2(static_cast<float>(player->getPosition().getDirectionX()) / POSITION_UNIT_X,
-                                       -static_cast<float>(player->getPosition().getDirectionY()) / POSITION_UNIT_Y) *
-                            180 / M_PI);
-    this->getWindow()->draw(playerShape);
 }
 
 /**
@@ -201,6 +155,10 @@ bool Display::handleEvents(Player *player, Level *level)
             player->rotateLeft();
         if (this->_events[sf::Keyboard::D] || this->_events[sf::Keyboard::Right])
             player->rotateRight();
+        if (this->_events[sf::Keyboard::A])
+            player->moveLeft(level);
+        if (this->_events[sf::Keyboard::E])
+            player->moveRight(level);
         currentTimer.restart();
         this->setEventTimer(currentTimer);
     }

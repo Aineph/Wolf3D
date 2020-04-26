@@ -30,6 +30,10 @@ public:
 
     bool rotateRight();
 
+    bool moveLeft(Level *);
+
+    bool moveRight(Level *);
+
     Position const &getPosition() const;
 
     void setPosition(Position const &);

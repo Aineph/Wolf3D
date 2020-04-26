@@ -6,21 +6,26 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <cmath>
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
+#include "IDrawable.hh"
 #include "Position.hh"
 #include "Level.hh"
 #include "Player.hh"
 #include "Display.hh"
-#include "Ray.hh"
+#include "ARay.hh"
+#include "HorizontalRay.hh"
+#include "VerticalRay.hh"
+#include "Minimap.hh"
 #include "RayCaster.hh"
 
 /**
  * The raycaster constructor.
  */
-RayCaster::RayCaster()
+RayCaster::RayCaster::RayCaster()
 {
-    this->setRayPosition(Position());
+    this->setMinimap(Minimap());
     this->setWindow(nullptr);
     this->setWindowSize(sf::Vector2u());
 }
@@ -28,20 +33,21 @@ RayCaster::RayCaster()
 /**
  * The raycaster constructor.
  */
-RayCaster::RayCaster(sf::RenderWindow *window)
+RayCaster::RayCaster::RayCaster(sf::RenderWindow *window, Level *level)
 {
-    this->setRayPosition(Position());
+    sf::Vector2u const &windowDimensions = window->getSize();
+
+    this->setMinimap(Minimap(level, windowDimensions));
     this->setWindow(window);
-    this->setWindowSize(window->getSize());
+    this->setWindowSize(windowDimensions);
 }
 
 /**
  * The raycaster constructor.
  * @param other
  */
-RayCaster::RayCaster(RayCaster const &other)
+RayCaster::RayCaster::RayCaster(RayCaster const &other)
 {
-    this->setRayPosition(other.getRayPosition());
     this->setWindow(other.getWindow());
     this->setWindowSize(other.getWindowSize());
 }
@@ -50,11 +56,10 @@ RayCaster::RayCaster(RayCaster const &other)
  * The raycaster equal operator.
  * @param other
  */
-RayCaster &RayCaster::operator=(RayCaster const &other)
+RayCaster::RayCaster &RayCaster::RayCaster::operator=(RayCaster const &other)
 {
     if (this != &other)
     {
-        this->setRayPosition(other.getRayPosition());
         this->setWindow(other.getWindow());
         this->setWindowSize(other.getWindowSize());
     }
@@ -66,80 +71,62 @@ RayCaster &RayCaster::operator=(RayCaster const &other)
  * @param playerPosition
  * @param levelMap
  */
-void RayCaster::compute(Position const &playerPosition, Level *level,
-                        std::map<Level::BlockType, sf::Texture *> const &textures, Display::DisplayType displayType)
+void RayCaster::RayCaster::compute(Position const &playerPosition, Level *level,
+                                   std::map<Level::BlockType, sf::Texture *> const &textures,
+                                   Display::DisplayType displayType)
 {
     sf::Vector2u const &windowDimensions = this->getWindowSize();
-    sf::RectangleShape floor;
-    sf::Texture *floorTexture;
+    Minimap minimap = this->getMinimap();
+    ARay *currentRay;
     int windowRow = 0;
     int windowColumn = 0;
-    Ray currentRay;
 
-    floorTexture = textures.at(Level::BlockType::BLOCK_WOODEN_WALL);
     while (windowRow < windowDimensions.y)
     {
-//        floor = sf::RectangleShape(sf::Vector2f(windowDimensions.x, 1));
-        //       floor.setPosition(0, windowRow);
-        //      floor.setFillColor(sf::Color::Yellow);
-        //    floor.setTexture(floorTexture);
-        //  floor.setTextureRect(sf::IntRect(0, windowRow % 64, 1, 64));
-        // this->getWindow()->draw(floor);
+        currentRay = new HorizontalRay(sf::Vector2u(0, windowRow), displayType);
+        currentRay->initialize(playerPosition, windowDimensions);
+        currentRay->cast(playerPosition, level, textures, windowDimensions);
+        currentRay->render(this->getWindow());
+        delete currentRay;
         windowRow += 1;
     }
     while (windowColumn < windowDimensions.x)
     {
-        this->initialize(windowColumn, playerPosition);
-        currentRay = Ray(playerPosition, this->getRayPosition(), level, windowDimensions.y);
-        currentRay.initializeTexture(textures.at(currentRay.getHitBlockType()));
-        currentRay.fillScreen(this->getWindow(), windowColumn, windowDimensions, displayType);
+        currentRay = new VerticalRay(sf::Vector2u(windowColumn, 0), displayType);
+        currentRay->initialize(playerPosition, windowDimensions);
+        currentRay->cast(playerPosition, level, textures, windowDimensions);
+        currentRay->render(this->getWindow());
+        delete currentRay;
         windowColumn += 1;
     }
+    minimap.setPlayerPosition(playerPosition);
+    this->setMinimap(minimap);
+    this->getMinimap().render(this->getWindow());
 }
 
 /**
- * Initializes the raycasting vectors.
- * @param playerPosition
+ * The getter for the minimap.
  * @return
  */
-void RayCaster::initialize(int windowColumn, Position const &playerPosition)
+Minimap const &RayCaster::RayCaster::getMinimap() const
 {
-    Position rayPosition = this->getRayPosition();
-    int cameraPosition = 0;
-
-    cameraPosition = (((2 * windowColumn) * POSITION_UNIT_X) / this->getWindowSize().x) - POSITION_UNIT_X;
-    rayPosition.setPositionX((playerPosition.getPositionX() / POSITION_UNIT_X) * POSITION_UNIT_X);
-    rayPosition.setPositionY((playerPosition.getPositionY() / POSITION_UNIT_Y) * POSITION_UNIT_Y);
-    rayPosition.setDirectionX(
-            static_cast<long>(playerPosition.getDirectionX() + (playerPosition.getPlaneX() * cameraPosition)));
-    rayPosition.setDirectionY(
-            static_cast<long>(playerPosition.getDirectionY() + (playerPosition.getPlaneY() * cameraPosition)));
-    this->setRayPosition(rayPosition);
+    return this->_minimap;
 }
 
 /**
- * The getter for the ray position.
- * @return
+ * The setter for the minimap.
+ * @param minimap
  */
-Position const &RayCaster::getRayPosition() const
+void RayCaster::RayCaster::setMinimap(Minimap const &minimap)
 {
-    return this->_rayPosition;
-}
-
-/**
- * The setter for the ray position.
- * @param rayPosition
- */
-void RayCaster::setRayPosition(Position const &rayPosition)
-{
-    this->_rayPosition = rayPosition;
+    this->_minimap = minimap;
 }
 
 /**
  * The getter for the window.
  * @return
  */
-sf::RenderWindow *RayCaster::getWindow() const
+sf::RenderWindow *RayCaster::RayCaster::getWindow() const
 {
     return this->_window;
 }
@@ -148,7 +135,7 @@ sf::RenderWindow *RayCaster::getWindow() const
  * The setter for the window.
  * @param window
  */
-void RayCaster::setWindow(sf::RenderWindow *window)
+void RayCaster::RayCaster::setWindow(sf::RenderWindow *window)
 {
     this->_window = window;
 }
@@ -157,7 +144,7 @@ void RayCaster::setWindow(sf::RenderWindow *window)
  * The getter for the window size.
  * @return
  */
-sf::Vector2u const &RayCaster::getWindowSize() const
+sf::Vector2u const &RayCaster::RayCaster::getWindowSize() const
 {
     return this->_windowSize;
 }
@@ -166,7 +153,7 @@ sf::Vector2u const &RayCaster::getWindowSize() const
  * The setter for the window size.
  * @param windowSize
  */
-void RayCaster::setWindowSize(sf::Vector2u const &windowSize)
+void RayCaster::RayCaster::setWindowSize(sf::Vector2u const &windowSize)
 {
     this->_windowSize = windowSize;
 }

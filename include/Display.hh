@@ -7,16 +7,13 @@
 #define WOLF3D_DISPLAY_HH
 
 #define DISPLAY_DEFAULT_TITLE "Wolf3D"
-#define DISPLAY_DEFAULT_WIDTH 1920
-#define DISPLAY_DEFAULT_HEIGHT 1080
+#define DISPLAY_DEFAULT_WIDTH 800
+#define DISPLAY_DEFAULT_HEIGHT 600
 
-#define DISPLAY_DEFAULT_MAP_RATIO 4
-#define DISPLAY_DEFAULT_PLAYER_SIZE 10
-#define DISPLAY_TRIANGLE_SHAPE 3
-
-#define TEXTURE_STANDARD_WALL "../resources/textures/redbrick.png"
-#define TEXTURE_EAGLE_WALL "../resources/textures/eagle.png"
-#define TEXTURE_WOODEN_WALL "../resources/textures/wood.png"
+#define TEXTURE_STANDARD_WALL "../resources/textures/tile017.png"
+#define TEXTURE_EAGLE_WALL "../resources/textures/tile014.png"
+#define TEXTURE_WOODEN_WALL "../resources/textures/tile006.png"
+#define TEXTURE_BLUE_WALL "../resources/textures/tile045.png"
 
 class Display
 {
@@ -35,8 +32,6 @@ public:
     bool loadTextures();
 
     bool render(Player *, Level *);
-
-    void renderMap(Player *, Level *);
 
     bool handleEvents(Player *, Level *);
 

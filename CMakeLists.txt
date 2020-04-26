@@ -9,11 +9,13 @@ set(PROJECT_SRCS
         src/Display.cpp
         src/Level.cpp
         src/Game.cpp
-        include/Game.hh
         src/Player.cpp
         src/Position.cpp
         src/RayCaster.cpp
-        src/Ray.cpp)
+        src/Minimap.cpp
+        src/ARay.cpp
+        src/VerticalRay.cpp
+        src/HorizontalRay.cpp)
 
 # Defining the project.
 
