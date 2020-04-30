@@ -1,7 +1,7 @@
 # Wolf3D
 A remake of the game Wolfenstein 3D using the ray-casting technique.
 
-![Wolf3D Illustration](https://cloudinary-a.akamaihd.net/hopwork/image/upload/w_2048,c_limit,dpr_2/qbuuxa628shlyvgd1bwn.jpeg "Wolf3D Illustration")
+![Wolf3D Illustration](https://www.nicolasfez.com/uploads/projects/img_5447-5eaacc0eee818.jpeg "Wolf3D Illustration")
 
 # Summary
 
@@ -48,6 +48,8 @@ Here is the list of the engine's controls:
 - **S**, **Direction down**: Move backward.
 - **Q**, **Direction left**: Rotate left.
 - **D**, **Direction right**: Rotate right.
+- **R**: Look Up.
+- **F**: Look Down.
 - **A**: Move left.
 - **E**: Move right.
 - **T**: Toggles the rendering mode, either textured or vanilla.
