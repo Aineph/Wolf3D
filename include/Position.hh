@@ -15,6 +15,7 @@
 #define POSITION_DEFAULT_DIRECTION_Y 0
 #define POSITION_DEFAULT_PLANE_X .66
 #define POSITION_DEFAULT_PLANE_Y .66
+#define POSITION_DEFAULT_PITCH 0
 
 class Position
 {
@@ -27,21 +28,21 @@ public:
 
     friend std::ostream &operator<<(std::ostream &, Position const &);
 
-    long getPositionX() const;
+    long long getPositionX() const;
 
-    void setPositionX(long);
+    void setPositionX(long long);
 
-    long getPositionY() const;
+    long long getPositionY() const;
 
-    void setPositionY(long);
+    void setPositionY(long long);
 
-    long getDirectionX() const;
+    long long getDirectionX() const;
 
-    void setDirectionX(long);
+    void setDirectionX(long long);
 
-    long getDirectionY() const;
+    long long getDirectionY() const;
 
-    void setDirectionY(long);
+    void setDirectionY(long long);
 
     double getPlaneX() const;
 
@@ -51,13 +52,18 @@ public:
 
     void setPlaneY(double);
 
+    int getPitch() const;
+
+    void setPitch(int);
+
 private:
-    long _positionX;
-    long _positionY;
-    long _directionX;
-    long _directionY;
+    long long _positionX;
+    long long _positionY;
+    long long _directionX;
+    long long _directionY;
     double _planeX;
     double _planeY;
+    int _pitch;
 };
 
 

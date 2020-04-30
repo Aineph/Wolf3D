@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <SFML/System.hpp>
 #include "Position.hh"
 #include "Level.hh"
 #include "Player.hh"
@@ -185,6 +186,34 @@ bool Player::rotateRight()
     currentPosition.setDirectionX(static_cast<long>(cos((directionAngle * M_PI) / 180) * POSITION_UNIT_X));
     currentPosition.setDirectionY(static_cast<long>(sin((directionAngle * M_PI) / 180) * POSITION_UNIT_X));
     this->setPosition(currentPosition);
+    return true;
+}
+
+/**
+ * Rotates the player to the top.
+ * @return
+ */
+bool Player::rotateUp(sf::Vector2u const &windowDimensions)
+{
+    Position currentPosition = this->getPosition();
+
+    currentPosition.setPitch(currentPosition.getPitch() + (windowDimensions.y / 20));
+    if (currentPosition.getPitch() < (static_cast<int>(windowDimensions.y) / 2))
+        this->setPosition(currentPosition);
+    return true;
+}
+
+/**
+ * Rotates the player to the bottom.
+ * @return
+ */
+bool Player::rotateDown(sf::Vector2u const &windowDimensions)
+{
+    Position currentPosition = this->getPosition();
+
+    currentPosition.setPitch(currentPosition.getPitch() - (windowDimensions.y / 20));
+    if (currentPosition.getPitch() > -(static_cast<int>(windowDimensions.y) / 2))
+        this->setPosition(currentPosition);
     return true;
 }
 

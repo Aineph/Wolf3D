@@ -6,6 +6,8 @@
 #ifndef WOLF3D_PLAYER_HH
 #define WOLF3D_PLAYER_HH
 
+#include <SFML/System.hpp>
+
 #define PLAYER_DEFAULT_SPEED .05
 #define PLAYER_DEFAULT_ROTATION M_PI / 60
 
@@ -29,6 +31,10 @@ public:
     bool rotateLeft();
 
     bool rotateRight();
+
+    bool rotateUp(sf::Vector2u const &);
+
+    bool rotateDown(sf::Vector2u const &);
 
     bool moveLeft(Level *);
 

@@ -17,6 +17,7 @@ Position::Position()
     this->setDirectionY(POSITION_DEFAULT_DIRECTION_Y);
     this->setPlaneX(POSITION_DEFAULT_PLANE_X);
     this->setPlaneY(POSITION_DEFAULT_PLANE_Y);
+    this->setPitch(POSITION_DEFAULT_PITCH);
 }
 
 /**
@@ -31,6 +32,7 @@ Position::Position(Position const &other)
     this->setDirectionY(other.getDirectionY());
     this->setPlaneX(other.getPlaneX());
     this->setPlaneY(other.getPlaneY());
+    this->setPitch(other.getPitch());
 }
 
 /**
@@ -48,6 +50,7 @@ Position &Position::operator=(Position const &other)
         this->setDirectionY(other.getDirectionY());
         this->setPlaneX(other.getPlaneX());
         this->setPlaneY(other.getPlaneY());
+        this->setPitch(other.getPitch());
     }
     return *this;
 }
@@ -68,6 +71,7 @@ std::ostream &operator<<(std::ostream &os, Position const &position)
     os << "Direction Y: " << position.getDirectionY() << std::endl;
     os << "Plane X: " << position.getPlaneX() << std::endl;
     os << "Plane Y: " << position.getPlaneY() << std::endl;
+    os << "Pitch: " << position.getPitch() << std::endl;
     os << "------------------------------" << std::endl;
     return os;
 }
@@ -76,7 +80,7 @@ std::ostream &operator<<(std::ostream &os, Position const &position)
  * The getter for the position x.
  * @return
  */
-long Position::getPositionX() const
+long long Position::getPositionX() const
 {
     return this->_positionX;
 }
@@ -85,7 +89,7 @@ long Position::getPositionX() const
  * The setter for the position x.
  * @return
  */
-void Position::setPositionX(long positionX)
+void Position::setPositionX(long long positionX)
 {
     this->_positionX = positionX;
 }
@@ -94,7 +98,7 @@ void Position::setPositionX(long positionX)
  * The getter for the position y.
  * @return
  */
-long Position::getPositionY() const
+long long Position::getPositionY() const
 {
     return this->_positionY;
 }
@@ -103,7 +107,7 @@ long Position::getPositionY() const
  * The setter for the position y.
  * @return
  */
-void Position::setPositionY(long positionY)
+void Position::setPositionY(long long positionY)
 {
     this->_positionY = positionY;
 }
@@ -112,7 +116,7 @@ void Position::setPositionY(long positionY)
  * The getter for the direction x.
  * @return
  */
-long Position::getDirectionX() const
+long long Position::getDirectionX() const
 {
     return this->_directionX;
 }
@@ -121,7 +125,7 @@ long Position::getDirectionX() const
  * The setter for the direction x.
  * @return
  */
-void Position::setDirectionX(long directionX)
+void Position::setDirectionX(long long directionX)
 {
     this->_directionX = directionX;
 }
@@ -130,7 +134,7 @@ void Position::setDirectionX(long directionX)
  * The getter for the direction y.
  * @return
  */
-long Position::getDirectionY() const
+long long Position::getDirectionY() const
 {
     return this->_directionY;
 }
@@ -139,7 +143,7 @@ long Position::getDirectionY() const
  * The setter for the direction y.
  * @return
  */
-void Position::setDirectionY(long directionY)
+void Position::setDirectionY(long long directionY)
 {
     this->_directionY = directionY;
 }
@@ -178,4 +182,22 @@ double Position::getPlaneY() const
 void Position::setPlaneY(double planeY)
 {
     this->_planeY = planeY;
+}
+
+/**
+ * The getter for the pitch.
+ * @return
+ */
+int Position::getPitch() const
+{
+    return this->_pitch;
+}
+
+/**
+ * The setter for the pitch.
+ * @param pitch
+ */
+void Position::setPitch(int pitch)
+{
+    this->_pitch = pitch;
 }

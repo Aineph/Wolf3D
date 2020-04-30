@@ -7,7 +7,7 @@
 #define WOLF3D_LEVEL_HH
 
 #define LEVEL_DEFAULT_NAME "Default Level"
-#define LEVEL_DEFAULT_FILE "../resources/levels/default.lvl"
+#define LEVEL_DEFAULT_FILE "../resources/levels/test.lvl"
 
 class Level
 {

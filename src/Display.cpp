@@ -155,6 +155,10 @@ bool Display::handleEvents(Player *player, Level *level)
             player->rotateLeft();
         if (this->_events[sf::Keyboard::D] || this->_events[sf::Keyboard::Right])
             player->rotateRight();
+        if (this->_events[sf::Keyboard::R])
+            player->rotateUp(this->getWindow()->getSize());
+        if (this->_events[sf::Keyboard::F])
+            player->rotateDown(this->getWindow()->getSize());
         if (this->_events[sf::Keyboard::A])
             player->moveLeft(level);
         if (this->_events[sf::Keyboard::E])

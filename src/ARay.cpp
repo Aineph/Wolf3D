@@ -23,7 +23,7 @@ RayCaster::ARay::ARay()
     this->setRayTextureCoordinates(new sf::Vector2f[RAY_VERTEX_NUMBER]);
     this->setIncrementalSteps(sf::Vector2i());
     this->setRayDisplayType(Display::DisplayType::DISPLAY_VANILLA);
-    this->setRayColor(sf::Color::White);
+    this->setRayColor(sf::Color::Black);
     this->setRayTexture(nullptr);
 }
 
@@ -41,7 +41,7 @@ RayCaster::ARay::ARay(sf::Vector2u const &rayCoordinates, Display::DisplayType r
     this->setRayTextureCoordinates(new sf::Vector2f[RAY_VERTEX_NUMBER]);
     this->setIncrementalSteps(sf::Vector2i());
     this->setRayDisplayType(rayDisplayType);
-    this->setRayColor(sf::Color::White);
+    this->setRayColor(sf::Color::Black);
     this->setRayTexture(nullptr);
     while (coordinateIndex < RAY_VERTEX_NUMBER)
     {

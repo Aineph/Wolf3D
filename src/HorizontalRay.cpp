@@ -99,32 +99,39 @@ void RayCaster::HorizontalRay::cast(Position const &playerPosition, Level *level
     Position lastRayPosition = this->getLastRayPosition();
     sf::Vector2i incrementalSteps = this->getIncrementalSteps();
     sf::Color rayColor = this->getRayColor();
+    char rayBrightness = 0;
     int coordinateIndex = 0;
 
+    rayBrightness = (std::abs(static_cast<int>((windowDimensions.y / 2) + playerPosition.getPitch()) -
+                              this->getRayCoordinates()[RAY_VERTEX_NUMBER - 1].y) * 255) / windowDimensions.y;
     this->setRayDistance(0);
     if (RAY_VERTEX_NUMBER > 0)
     {
-        if (this->getRayCoordinates()[RAY_VERTEX_NUMBER - 1].y - (windowDimensions.y / 2) != 0)
+        if (this->getRayCoordinates()[RAY_VERTEX_NUMBER - 1].y -
+            ((windowDimensions.y / 2) + playerPosition.getPitch()) != 0)
             this->setRayDistance(((static_cast<int>(windowDimensions.y) / 2) * POSITION_UNIT_X) /
                                  (this->getRayCoordinates()[RAY_VERTEX_NUMBER - 1].y -
-                                  (static_cast<int>(windowDimensions.y) / 2)));
+                                  ((static_cast<int>(windowDimensions.y) / 2) + playerPosition.getPitch())));
         if (this->getRayDistance() >= 0)
+        {
             this->setRayTexture(levelTextures.at(Level::BlockType::BLOCK_WOODEN_WALL));
+            if (this->getRayDisplayType() == Display::DisplayType::DISPLAY_VANILLA)
+                rayColor.g = rayBrightness;
+        }
         else
         {
             this->setRayDistance(-this->getRayDistance());
             this->setRayTexture(levelTextures.at(Level::BlockType::BLOCK_BLUE_WALL));
+            if (this->getRayDisplayType() == Display::DisplayType::DISPLAY_VANILLA)
+                rayColor.b = rayBrightness;
+        }
+        if (this->getRayDisplayType() == Display::DisplayType::DISPLAY_TEXTURED)
+        {
+            rayColor.r = rayBrightness;
+            rayColor.g = rayBrightness;
+            rayColor.b = rayBrightness;
         }
         this->getRayTexture()->setRepeated(true);
-        rayColor.r = (std::abs(
-                static_cast<int>(windowDimensions.y / 2) - this->getRayCoordinates()[RAY_VERTEX_NUMBER - 1].y) * 255) /
-                     (windowDimensions.y / 2);
-        rayColor.g = (std::abs(
-                static_cast<int>(windowDimensions.y / 2) - this->getRayCoordinates()[RAY_VERTEX_NUMBER - 1].y) * 255) /
-                     (windowDimensions.y / 2);
-        rayColor.b = (std::abs(
-                static_cast<int>(windowDimensions.y / 2) - this->getRayCoordinates()[RAY_VERTEX_NUMBER - 1].y) * 255) /
-                     (windowDimensions.y / 2);
     }
     firstRayPosition.setPositionX(((playerPosition.getPositionX() * POSITION_UNIT_X) +
                                    (this->getRayDistance() * firstRayPosition.getDirectionX())) / POSITION_UNIT_X);

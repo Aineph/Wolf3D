@@ -213,15 +213,16 @@ void RayCaster::VerticalRay::fillCoordinates(int hitAxis, Position const &player
     while (coordinateIndex < RAY_VERTEX_NUMBER)
     {
         this->getRayCoordinates()[coordinateIndex].y =
-                ((windowDimensions.y / 2) - (wallSize / 2)) + (coordinateIndex * (wallSize / (RAY_VERTEX_NUMBER - 1)));
+                (((windowDimensions.y / 2) + playerPosition.getPitch()) - (wallSize / 2)) +
+                (coordinateIndex * (wallSize / (RAY_VERTEX_NUMBER - 1)));
         this->getRayTextureCoordinates()[coordinateIndex].x = hitPosition;
         this->getRayTextureCoordinates()[coordinateIndex].y =
                 coordinateIndex * (this->getRayTexture()->getSize().y / (RAY_VERTEX_NUMBER - 1));
         coordinateIndex += 1;
     }
-    rayColor.r = (rayColor.r * std::min(windowDimensions.y, wallSize)) / windowDimensions.y;
-    rayColor.g = (rayColor.g * std::min(windowDimensions.y, wallSize)) / windowDimensions.y;
-    rayColor.b = (rayColor.b * std::min(windowDimensions.y, wallSize)) / windowDimensions.y;
+    rayColor.r = (255 * std::min(windowDimensions.y, wallSize)) / windowDimensions.y;
+    rayColor.g = (255 * std::min(windowDimensions.y, wallSize)) / windowDimensions.y;
+    rayColor.b = (255 * std::min(windowDimensions.y, wallSize)) / windowDimensions.y;
     this->setRayColor(rayColor);
 }
 
