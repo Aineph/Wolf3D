@@ -3,10 +3,7 @@
  * Started on 2020-04-10.
  */
 
-#include <iostream>
-#include <vector>
 #include <map>
-#include <cmath>
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include "IDrawable.hh"
@@ -18,12 +15,12 @@
 #include "HorizontalRay.hh"
 #include "VerticalRay.hh"
 #include "Minimap.hh"
-#include "RayCaster.hh"
+#include "Engine.hh"
 
 /**
- * The raycaster constructor.
+ * The engine constructor.
  */
-RayCaster::RayCaster::RayCaster()
+RayCaster::Engine::Engine()
 {
     this->setMinimap(Minimap());
     this->setWindow(nullptr);
@@ -31,9 +28,9 @@ RayCaster::RayCaster::RayCaster()
 }
 
 /**
- * The raycaster constructor.
+ * The engine constructor.
  */
-RayCaster::RayCaster::RayCaster(sf::RenderWindow *window, Level *level)
+RayCaster::Engine::Engine(sf::RenderWindow *window, Level *level)
 {
     sf::Vector2u const &windowDimensions = window->getSize();
 
@@ -43,20 +40,20 @@ RayCaster::RayCaster::RayCaster(sf::RenderWindow *window, Level *level)
 }
 
 /**
- * The raycaster constructor.
+ * The engine constructor.
  * @param other
  */
-RayCaster::RayCaster::RayCaster(RayCaster const &other)
+RayCaster::Engine::Engine(Engine const &other)
 {
     this->setWindow(other.getWindow());
     this->setWindowSize(other.getWindowSize());
 }
 
 /**
- * The raycaster equal operator.
+ * The engine equal operator.
  * @param other
  */
-RayCaster::RayCaster &RayCaster::RayCaster::operator=(RayCaster const &other)
+RayCaster::Engine &RayCaster::Engine::operator=(Engine const &other)
 {
     if (this != &other)
     {
@@ -67,13 +64,13 @@ RayCaster::RayCaster &RayCaster::RayCaster::operator=(RayCaster const &other)
 }
 
 /**
- * Computes the view from the player's point of view.
+ * Performs raycasting from the player's point of view.
  * @param playerPosition
  * @param levelMap
  */
-void RayCaster::RayCaster::compute(Position const &playerPosition, Level *level,
-                                   std::map<Level::BlockType, sf::Texture *> const &textures,
-                                   Display::DisplayType displayType)
+void RayCaster::Engine::raycast(Position const &playerPosition, Level *level,
+                                std::map<Level::BlockType, sf::Texture *> const &textures,
+                                Display::DisplayType displayType)
 {
     sf::Vector2u const &windowDimensions = this->getWindowSize();
     Minimap minimap = this->getMinimap();
@@ -108,7 +105,7 @@ void RayCaster::RayCaster::compute(Position const &playerPosition, Level *level,
  * The getter for the minimap.
  * @return
  */
-Minimap const &RayCaster::RayCaster::getMinimap() const
+Minimap const &RayCaster::Engine::getMinimap() const
 {
     return this->_minimap;
 }
@@ -117,7 +114,7 @@ Minimap const &RayCaster::RayCaster::getMinimap() const
  * The setter for the minimap.
  * @param minimap
  */
-void RayCaster::RayCaster::setMinimap(Minimap const &minimap)
+void RayCaster::Engine::setMinimap(Minimap const &minimap)
 {
     this->_minimap = minimap;
 }
@@ -126,7 +123,7 @@ void RayCaster::RayCaster::setMinimap(Minimap const &minimap)
  * The getter for the window.
  * @return
  */
-sf::RenderWindow *RayCaster::RayCaster::getWindow() const
+sf::RenderWindow *RayCaster::Engine::getWindow() const
 {
     return this->_window;
 }
@@ -135,7 +132,7 @@ sf::RenderWindow *RayCaster::RayCaster::getWindow() const
  * The setter for the window.
  * @param window
  */
-void RayCaster::RayCaster::setWindow(sf::RenderWindow *window)
+void RayCaster::Engine::setWindow(sf::RenderWindow *window)
 {
     this->_window = window;
 }
@@ -144,7 +141,7 @@ void RayCaster::RayCaster::setWindow(sf::RenderWindow *window)
  * The getter for the window size.
  * @return
  */
-sf::Vector2u const &RayCaster::RayCaster::getWindowSize() const
+sf::Vector2u const &RayCaster::Engine::getWindowSize() const
 {
     return this->_windowSize;
 }
@@ -153,7 +150,7 @@ sf::Vector2u const &RayCaster::RayCaster::getWindowSize() const
  * The setter for the window size.
  * @param windowSize
  */
-void RayCaster::RayCaster::setWindowSize(sf::Vector2u const &windowSize)
+void RayCaster::Engine::setWindowSize(sf::Vector2u const &windowSize)
 {
     this->_windowSize = windowSize;
 }

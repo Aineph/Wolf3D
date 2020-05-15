@@ -4,7 +4,6 @@
  */
 
 #include <map>
-#include <vector>
 #include <SFML/Graphics.hpp>
 #include "IDrawable.hh"
 #include "Position.hh"

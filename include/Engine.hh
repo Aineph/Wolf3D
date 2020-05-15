@@ -3,26 +3,26 @@
  * Started on 2020-04-10.
  */
 
-#ifndef WOLF3D_RAYCASTER_HH
-#define WOLF3D_RAYCASTER_HH
+#ifndef WOLF3D_ENGINE_HH
+#define WOLF3D_ENGINE_HH
 
 namespace RayCaster
 {
-    class RayCaster
+    class Engine
     {
     public:
-        RayCaster();
+        Engine();
 
-        RayCaster(sf::RenderWindow *, Level *);
+        Engine(sf::RenderWindow *, Level *);
 
-        RayCaster(RayCaster const &);
+        Engine(Engine const &);
 
-        virtual ~RayCaster() = default;
+        virtual ~Engine() = default;
 
-        RayCaster &operator=(RayCaster const &);
+        Engine &operator=(Engine const &);
 
         void
-        compute(Position const &, Level *, std::map<Level::BlockType, sf::Texture *> const &, Display::DisplayType);
+        raycast(Position const &, Level *, std::map<Level::BlockType, sf::Texture *> const &, Display::DisplayType);
 
         Minimap const &getMinimap() const;
 
@@ -43,4 +43,4 @@ namespace RayCaster
     };
 }
 
-#endif //WOLF3D_RAYCASTER_HH
+#endif //WOLF3D_ENGINE_HH

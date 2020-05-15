@@ -4,7 +4,6 @@
  */
 
 #include <map>
-#include <vector>
 #include <SFML/Graphics.hpp>
 #include "IDrawable.hh"
 #include "Position.hh"
@@ -151,7 +150,9 @@ void RayCaster::VerticalRay::cast(Position const &playerPosition, Level *level,
         positionX = rayPosition.getPositionX() / POSITION_UNIT_X;
         positionY = rayPosition.getPositionY() / POSITION_UNIT_Y;
         if (positionX >= level->getLevelWidth() || positionX < 0 || positionY >= level->getLevelHeight() ||
-            positionY < 0 || Level::isLevelWall(level->getLevelMap()[positionY][positionX]))
+            positionY < 0)
+            return this->setRayTexture(nullptr);
+        if (Level::isLevelWall(level->getLevelMap()[positionY][positionX]))
         {
             this->setRayTexture(
                     levelTextures.at(static_cast<Level::BlockType>(level->getLevelMap()[positionY][positionX])));

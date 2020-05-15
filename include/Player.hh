@@ -6,10 +6,8 @@
 #ifndef WOLF3D_PLAYER_HH
 #define WOLF3D_PLAYER_HH
 
-#include <SFML/System.hpp>
-
 #define PLAYER_DEFAULT_SPEED .05
-#define PLAYER_DEFAULT_ROTATION M_PI / 60
+#define PLAYER_DEFAULT_ROTATION M_PI / 30
 
 class Player
 {

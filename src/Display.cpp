@@ -3,11 +3,7 @@
  * Started on 2020-04-08.
  */
 
-#include <iostream>
-#include <string>
 #include <map>
-#include <vector>
-#include <cmath>
 #include <exception>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -18,7 +14,7 @@
 #include "Player.hh"
 #include "Display.hh"
 #include "Minimap.hh"
-#include "RayCaster.hh"
+#include "Engine.hh"
 
 Display *Display::_instance = nullptr;
 
@@ -29,12 +25,14 @@ Display::Display()
 {
     this->setWindowTitle(DISPLAY_DEFAULT_TITLE);
     this->setWindow(
-            new sf::RenderWindow(sf::VideoMode(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT), this->getWindowTitle(),
-                                 sf::Style::None));
+            new sf::RenderWindow(sf::VideoMode(DISPLAY_DEFAULT_WIDTH, DISPLAY_DEFAULT_HEIGHT, DISPLAY_DEFAULT_BPP),
+                                 this->getWindowTitle(), sf::Style::None));
     this->getWindow()->setFramerateLimit(60);
     this->getWindow()->setVerticalSyncEnabled(true);
+    this->getWindow()->setMouseCursorVisible(false);
+  //  sf::Mouse::setPosition(sf::Vector2i(DISPLAY_DEFAULT_WIDTH / 2, DISPLAY_DEFAULT_HEIGHT / 2), *this->getWindow());
     this->setDisplayType(DisplayType::DISPLAY_TEXTURED);
-    this->setEvents(std::map<sf::Keyboard::Key, bool>());
+    this->setKeyEvents(std::map<sf::Keyboard::Key, bool>());
     this->setTextures(std::map<Level::BlockType, sf::Texture *>());
     this->setEventTimer(sf::Clock());
     if (!this->loadTextures())
@@ -70,10 +68,22 @@ bool Display::loadTextures()
 {
     std::map<Level::BlockType, sf::Texture *> textures = this->getTextures();
 
-    textures[Level::BLOCK_STANDARD_WALL] = new sf::Texture();
-    if (!textures[Level::BLOCK_STANDARD_WALL]->loadFromFile(TEXTURE_STANDARD_WALL))
+    textures[Level::BLOCK_BARREL] = new sf::Texture();
+    if (!textures[Level::BLOCK_BARREL]->loadFromFile(TEXTURE_BARREL))
     {
-        delete textures[Level::BLOCK_STANDARD_WALL];
+        delete textures[Level::BLOCK_BARREL];
+        return false;
+    }
+    textures[Level::BLOCK_BLUE_WALL] = new sf::Texture();
+    if (!textures[Level::BLOCK_BLUE_WALL]->loadFromFile(TEXTURE_BLUE_WALL))
+    {
+        delete textures[Level::BLOCK_BLUE_WALL];
+        return false;
+    }
+    textures[Level::BLOCK_COLOR_WALL] = new sf::Texture();
+    if (!textures[Level::BLOCK_COLOR_WALL]->loadFromFile(TEXTURE_COLOR_WALL))
+    {
+        delete textures[Level::BLOCK_COLOR_WALL];
         return false;
     }
     textures[Level::BLOCK_EAGLE_WALL] = new sf::Texture();
@@ -82,16 +92,46 @@ bool Display::loadTextures()
         delete textures[Level::BLOCK_EAGLE_WALL];
         return false;
     }
+    textures[Level::BLOCK_GREEN_LIGHT] = new sf::Texture();
+    if (!textures[Level::BLOCK_GREEN_LIGHT]->loadFromFile(TEXTURE_GREEN_LIGHT))
+    {
+        delete textures[Level::BLOCK_GREEN_LIGHT];
+        return false;
+    }
+    textures[Level::BLOCK_GREY_WALL] = new sf::Texture();
+    if (!textures[Level::BLOCK_GREY_WALL]->loadFromFile(TEXTURE_GREY_WALL))
+    {
+        delete textures[Level::BLOCK_GREY_WALL];
+        return false;
+    }
+    textures[Level::BLOCK_MOSSY_WALL] = new sf::Texture();
+    if (!textures[Level::BLOCK_MOSSY_WALL]->loadFromFile(TEXTURE_MOSSY_WALL))
+    {
+        delete textures[Level::BLOCK_MOSSY_WALL];
+        return false;
+    }
+    textures[Level::BLOCK_PILLAR] = new sf::Texture();
+    if (!textures[Level::BLOCK_PILLAR]->loadFromFile(TEXTURE_PILLAR))
+    {
+        delete textures[Level::BLOCK_PILLAR];
+        return false;
+    }
+    textures[Level::BLOCK_PURPLE_WALL] = new sf::Texture();
+    if (!textures[Level::BLOCK_PURPLE_WALL]->loadFromFile(TEXTURE_PURPLE_WALL))
+    {
+        delete textures[Level::BLOCK_PURPLE_WALL];
+        return false;
+    }
+    textures[Level::BLOCK_RED_WALL] = new sf::Texture();
+    if (!textures[Level::BLOCK_RED_WALL]->loadFromFile(TEXTURE_RED_WALL))
+    {
+        delete textures[Level::BLOCK_RED_WALL];
+        return false;
+    }
     textures[Level::BLOCK_WOODEN_WALL] = new sf::Texture();
     if (!textures[Level::BLOCK_WOODEN_WALL]->loadFromFile(TEXTURE_WOODEN_WALL))
     {
         delete textures[Level::BLOCK_WOODEN_WALL];
-        return false;
-    }
-    textures[Level::BLOCK_BLUE_WALL] = new sf::Texture();
-    if (!textures[Level::BLOCK_BLUE_WALL]->loadFromFile(TEXTURE_BLUE_WALL))
-    {
-        delete textures[Level::BLOCK_BLUE_WALL];
         return false;
     }
     this->setTextures(textures);
@@ -105,10 +145,10 @@ bool Display::loadTextures()
  */
 bool Display::render(Player *player, Level *level)
 {
-    RayCaster::RayCaster rayCaster = RayCaster::RayCaster(this->getWindow(), level);
+    RayCaster::Engine rayCaster = RayCaster::Engine(this->getWindow(), level);
 
     this->getWindow()->clear(sf::Color::Black);
-    rayCaster.compute(player->getPosition(), level, this->getTextures(), this->getDisplayType());
+    rayCaster.raycast(player->getPosition(), level, this->getTextures(), this->getDisplayType());
     this->getWindow()->display();
     return true;
 }
@@ -121,8 +161,43 @@ bool Display::render(Player *player, Level *level)
  */
 bool Display::handleEvents(Player *player, Level *level)
 {
-    auto event = sf::Event();
+    sf::Vector2u const &windowDimensions = this->getWindow()->getSize();
+//    sf::Vector2i const &currentMouseLocation = sf::Mouse::getPosition(*this->getWindow());
     sf::Clock currentTimer = this->getEventTimer();
+
+    this->fetchEvents();
+    if (currentTimer.getElapsedTime().asMicroseconds() >= 10000)
+    {
+        if (this->_keyEvents[sf::Keyboard::Z])
+            player->moveForward(level);
+        if (this->_keyEvents[sf::Keyboard::S])
+            player->moveBackward(level);
+        if (this->_keyEvents[sf::Keyboard::Q])
+            player->moveLeft(level);
+        if (this->_keyEvents[sf::Keyboard::D])
+            player->moveRight(level);
+        if (/*currentMouseLocation.x < windowDimensions.x / 4 || */this->_keyEvents[sf::Keyboard::Left])
+            player->rotateLeft();
+        else if (/*urrentMouseLocation.x > 3 * windowDimensions.x / 4 || */this->_keyEvents[sf::Keyboard::Right])
+            player->rotateRight();
+        if (/*currentMouseLocation.y < windowDimensions.y / 4  || */this->_keyEvents[sf::Keyboard::Up])
+            player->rotateUp(this->getWindow()->getSize());
+        else if (/*currentMouseLocation.y > 3 * windowDimensions.y / 4 || */this->_keyEvents[sf::Keyboard::Down])
+            player->rotateDown(this->getWindow()->getSize());
+        //sf::Mouse::setPosition(sf::Vector2i(windowDimensions.x / 2, windowDimensions.y / 2), *this->getWindow());
+        currentTimer.restart();
+        this->setEventTimer(currentTimer);
+    }
+    return true;
+}
+
+/**
+ * Fetches the event from the window.
+ * @return
+ */
+bool Display::fetchEvents()
+{
+    auto event = sf::Event();
 
     while (this->getWindow()->pollEvent(event))
     {
@@ -138,33 +213,12 @@ bool Display::handleEvents(Player *player, Level *level)
             else if (event.key.code == sf::Keyboard::Escape)
                 this->getWindow()->close();
             else
-                this->_events[event.key.code] = true;
+                this->_keyEvents[event.key.code] = true;
         }
         else if (event.type == sf::Event::KeyReleased)
-            this->_events[event.key.code] = false;
+            this->_keyEvents[event.key.code] = false;
         else if (event.type == sf::Event::Closed)
             this->getWindow()->close();
-    }
-    if (currentTimer.getElapsedTime().asMicroseconds() >= 10000)
-    {
-        if (this->_events[sf::Keyboard::Z] || this->_events[sf::Keyboard::Up])
-            player->moveForward(level);
-        if (this->_events[sf::Keyboard::S] || this->_events[sf::Keyboard::Down])
-            player->moveBackward(level);
-        if (this->_events[sf::Keyboard::Q] || this->_events[sf::Keyboard::Left])
-            player->rotateLeft();
-        if (this->_events[sf::Keyboard::D] || this->_events[sf::Keyboard::Right])
-            player->rotateRight();
-        if (this->_events[sf::Keyboard::R])
-            player->rotateUp(this->getWindow()->getSize());
-        if (this->_events[sf::Keyboard::F])
-            player->rotateDown(this->getWindow()->getSize());
-        if (this->_events[sf::Keyboard::A])
-            player->moveLeft(level);
-        if (this->_events[sf::Keyboard::E])
-            player->moveRight(level);
-        currentTimer.restart();
-        this->setEventTimer(currentTimer);
     }
     return true;
 }
@@ -236,18 +290,18 @@ void Display::setDisplayType(Display::DisplayType displayType)
  * The getter for the events.
  * @return
  */
-std::map<sf::Keyboard::Key, bool> const &Display::getEvents() const
+std::map<sf::Keyboard::Key, bool> const &Display::getKeyEvents() const
 {
-    return this->_events;
+    return this->_keyEvents;
 }
 
 /**
  * The setter for the events.
  * @param events
  */
-void Display::setEvents(const std::map<sf::Keyboard::Key, bool> &events)
+void Display::setKeyEvents(const std::map<sf::Keyboard::Key, bool> &events)
 {
-    this->_events = events;
+    this->_keyEvents = events;
 }
 
 /**

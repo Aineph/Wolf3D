@@ -11,7 +11,7 @@ set(PROJECT_SRCS
         src/Game.cpp
         src/Player.cpp
         src/Position.cpp
-        src/RayCaster.cpp
+        src/Engine.cpp
         src/Minimap.cpp
         src/ARay.cpp
         src/VerticalRay.cpp
@@ -24,6 +24,10 @@ project(${PROJECT_NAME})
 # Adding the executable.
 
 add_executable(${PROJECT_NAME} ${PROJECT_SRCS})
+
+# Adding the math definition (M_PI, ...)
+
+add_definitions(-D_USE_MATH_DEFINES)
 
 # Including the project headers.
 

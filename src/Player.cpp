@@ -197,8 +197,8 @@ bool Player::rotateUp(sf::Vector2u const &windowDimensions)
 {
     Position currentPosition = this->getPosition();
 
-    currentPosition.setPitch(currentPosition.getPitch() + (windowDimensions.y / 20));
-    if (currentPosition.getPitch() < (static_cast<int>(windowDimensions.y) / 2))
+    currentPosition.setPitch(currentPosition.getPitch() + (windowDimensions.y / 10));
+    if (currentPosition.getPitch() < static_cast<int>(windowDimensions.y))
         this->setPosition(currentPosition);
     return true;
 }
@@ -211,8 +211,8 @@ bool Player::rotateDown(sf::Vector2u const &windowDimensions)
 {
     Position currentPosition = this->getPosition();
 
-    currentPosition.setPitch(currentPosition.getPitch() - (windowDimensions.y / 20));
-    if (currentPosition.getPitch() > -(static_cast<int>(windowDimensions.y) / 2))
+    currentPosition.setPitch(currentPosition.getPitch() - (windowDimensions.y / 10));
+    if (currentPosition.getPitch() > -static_cast<int>(windowDimensions.y))
         this->setPosition(currentPosition);
     return true;
 }

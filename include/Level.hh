@@ -7,7 +7,7 @@
 #define WOLF3D_LEVEL_HH
 
 #define LEVEL_DEFAULT_NAME "Default Level"
-#define LEVEL_DEFAULT_FILE "../resources/levels/test.lvl"
+#define LEVEL_DEFAULT_FILE "../resources/levels/default.lvl"
 
 class Level
 {
@@ -15,10 +15,17 @@ public:
     enum BlockType
     {
         BLOCK_EMPTY = '0',
-        BLOCK_STANDARD_WALL = '1',
-        BLOCK_EAGLE_WALL = '2',
-        BLOCK_WOODEN_WALL = '3',
-        BLOCK_BLUE_WALL = '4',
+        BLOCK_BARREL = 'b',
+        BLOCK_BLUE_WALL = '1',
+        BLOCK_COLOR_WALL = '2',
+        BLOCK_EAGLE_WALL = '3',
+        BLOCK_GREEN_LIGHT = 'g',
+        BLOCK_GREY_WALL = '4',
+        BLOCK_MOSSY_WALL = '5',
+        BLOCK_PILLAR = 'p',
+        BLOCK_PURPLE_WALL = '6',
+        BLOCK_RED_WALL = '7',
+        BLOCK_WOODEN_WALL = '8',
         BLOCK_START_UP = 'A',
         BLOCK_START_RIGHT = '>',
         BLOCK_START_DOWN = 'V',

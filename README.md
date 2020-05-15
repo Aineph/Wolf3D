@@ -44,14 +44,14 @@ $> ./Wolf3D
 
 Here is the list of the engine's controls:
 
-- **Z**, **Direction up**: Move forward.
-- **S**, **Direction down**: Move backward.
-- **Q**, **Direction left**: Rotate left.
-- **D**, **Direction right**: Rotate right.
-- **R**: Look Up.
-- **F**: Look Down.
-- **A**: Move left.
-- **E**: Move right.
+- **Z**: Move forward.
+- **S**: Move backward.
+- **Q**: Move left.
+- **D**: Move right.
+- **Up arrow**: Camera up.
+- **Down arrow**: Camera down.
+- **Left arrow**: Camera left.
+- **Right arrow**: Camera right.
 - **T**: Toggles the rendering mode, either textured or vanilla.
 - **Escape**: Quits the program.
 

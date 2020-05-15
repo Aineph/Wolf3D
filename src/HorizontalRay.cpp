@@ -4,7 +4,6 @@
  */
 
 #include <map>
-#include <vector>
 #include <SFML/Graphics.hpp>
 #include "IDrawable.hh"
 #include "Position.hh"
@@ -103,7 +102,7 @@ void RayCaster::HorizontalRay::cast(Position const &playerPosition, Level *level
     int coordinateIndex = 0;
 
     rayBrightness = (std::abs(static_cast<int>((windowDimensions.y / 2) + playerPosition.getPitch()) -
-                              this->getRayCoordinates()[RAY_VERTEX_NUMBER - 1].y) * 255) / windowDimensions.y;
+                              this->getRayCoordinates()[RAY_VERTEX_NUMBER - 1].y) * 255) / (windowDimensions.y * 2);
     this->setRayDistance(0);
     if (RAY_VERTEX_NUMBER > 0)
     {

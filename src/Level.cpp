@@ -84,9 +84,10 @@ std::ostream &operator<<(std::ostream &os, Level const &level)
  */
 bool Level::isLevelWall(int block)
 {
-    return static_cast<Level::BlockType>(block) == Level::BlockType::BLOCK_STANDARD_WALL ||
-           block == Level::BlockType::BLOCK_EAGLE_WALL || block == Level::BlockType::BLOCK_WOODEN_WALL ||
-           block == Level::BlockType::BLOCK_BLUE_WALL;
+    return block == Level::BlockType::BLOCK_BLUE_WALL || block == Level::BlockType::BLOCK_COLOR_WALL ||
+           block == Level::BlockType::BLOCK_EAGLE_WALL || block == Level::BlockType::BLOCK_GREY_WALL ||
+           block == Level::BlockType::BLOCK_MOSSY_WALL || block == Level::BlockType::BLOCK_PURPLE_WALL ||
+           block == Level::BlockType::BLOCK_RED_WALL || block == Level::BlockType::BLOCK_WOODEN_WALL;
 }
 
 /**
