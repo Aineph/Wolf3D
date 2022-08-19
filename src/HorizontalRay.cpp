@@ -101,8 +101,8 @@ void RayCaster::HorizontalRay::cast(Position const &playerPosition, Level *level
     char rayBrightness = 0;
     int coordinateIndex = 0;
 
-    rayBrightness = (std::abs(static_cast<int>((windowDimensions.y / 2) + playerPosition.getPitch()) -
-                              this->getRayCoordinates()[RAY_VERTEX_NUMBER - 1].y) * 255) / (windowDimensions.y * 2);
+    rayBrightness = ((std::abs(static_cast<int>((windowDimensions.y / 2) + playerPosition.getPitch()) -
+			       this->getRayCoordinates()[RAY_VERTEX_NUMBER - 1].y) * 155) / (windowDimensions.y * 2)) + 100;
     this->setRayDistance(0);
     if (RAY_VERTEX_NUMBER > 0)
     {
