@@ -1,7 +1,7 @@
 # Wolf3D
 A remake of the game Wolfenstein 3D using the ray-casting technique.
 
-![Wolf3D Illustration](https://api.nicolasfez.com/uploads/wolf3d_436387192c.jpeg "Wolf3D Illustration")
+![Wolf3D Illustration](https://res.cloudinary.com/deexzd1vz/image/upload/v1689606081/wolf3d_wjhiou.png "Wolf3D Illustration")
 
 # Summary
 
